@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #141a25;
+
+  /* TaxiCharg brand palette (sampled from the logo) */
+  --navy-950: #0a0e13;
+  --navy-900: #141a25;
+  --navy-800: #1c2530;
+  --navy-700: #26313d;
+  --navy-600: #34424f;
+  --navy-500: #4a5a68;
+
+  --orange-600: #eb5835;
+  --orange-500: #f97d23;
+  --orange-400: #faa638;
+  --orange-300: #fbbd6b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-navy-600: var(--navy-600);
+  --color-navy-500: var(--navy-500);
+
+  --color-orange-600: var(--orange-600);
+  --color-orange-500: var(--orange-500);
+  --color-orange-400: var(--orange-400);
+  --color-orange-300: var(--orange-300);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+.brand-gradient {
+  background: linear-gradient(135deg, var(--orange-400) 0%, var(--orange-500) 45%, var(--orange-600) 100%);
+}
+
+.brand-gradient-text {
+  background: linear-gradient(135deg, var(--orange-400) 0%, var(--orange-600) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.navy-gradient {
+  background: linear-gradient(160deg, var(--navy-800) 0%, var(--navy-950) 100%);
+}
+
+.card-shadow {
+  box-shadow: 0 10px 30px -12px rgba(10, 14, 19, 0.25);
+}

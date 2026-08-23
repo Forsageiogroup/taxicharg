@@ -67,6 +67,8 @@ export default function PaymentsTable({ payments }) {
             <option value="all">All statuses</option>
             <option value="settled">Settled</option>
             <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+            <option value="voided">Voided</option>
           </select>
         </div>
         <button
@@ -107,7 +109,7 @@ export default function PaymentsTable({ payments }) {
                 <td className="px-6 py-3 text-navy-400">-{currency(r.fee)}</td>
                 <td className="px-6 py-3 font-semibold text-navy-900">{currency(r.total)}</td>
                 <td className="px-6 py-3">
-                  <StatusPill status={r.status} />
+                  <StatusPill status={r.status} title={r.reason || r.voidReason || undefined} />
                 </td>
               </tr>
             ))}

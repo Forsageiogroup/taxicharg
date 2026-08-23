@@ -33,10 +33,13 @@ export default function AdminPaymentsTable({ payments, drivers }) {
   }, [payments, query, driverId, status]);
 
   const totals = useMemo(() => {
-    const gross = filtered.reduce((a, r) => a + r.total, 0);
-    const tips = filtered.reduce((a, r) => a + r.tip, 0);
-    const driversTotal = filtered.reduce((a, r) => a + (r.total - r.commission), 0);
-    const company = filtered.reduce((a, r) => a + r.commission, 0);
+    // Failed/voided transactions never moved real money — leave them out
+    // of the summary totals (they still show up in the table itself).
+    const moneyRows = filtered.filter((r) => r.status !== "failed" && r.status !== "voided");
+    const gross = moneyRows.reduce((a, r) => a + r.total, 0);
+    const tips = moneyRows.reduce((a, r) => a + r.tip, 0);
+    const driversTotal = moneyRows.reduce((a, r) => a + (r.total - r.commission), 0);
+    const company = moneyRows.reduce((a, r) => a + r.commission, 0);
     return { gross, tips, driversTotal, company };
   }, [filtered]);
 
@@ -104,6 +107,8 @@ export default function AdminPaymentsTable({ payments, drivers }) {
             <option value="all">All statuses</option>
             <option value="settled">Settled</option>
             <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+            <option value="voided">Voided</option>
           </select>
         </div>
         <button
@@ -139,7 +144,7 @@ export default function AdminPaymentsTable({ payments, drivers }) {
                 <td className="px-6 py-3 text-navy-700">{r.tip ? currency(r.tip) : "—"}</td>
                 <td className="px-6 py-3 font-semibold text-navy-900">{currency(r.total)}</td>
                 <td className="px-6 py-3">
-                  <StatusPill status={r.status} />
+                  <StatusPill status={r.status} title={r.reason || r.voidReason || undefined} />
                 </td>
               </tr>
             ))}

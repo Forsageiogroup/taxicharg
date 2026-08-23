@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { ShieldAlert } from "lucide-react";
 import { getFleetOverview, getFleetRevenueSeries, getLivePayments, getDriversLast7Days } from "@/lib/data/reports";
+import { getPaymentIssuesSummary } from "@/lib/data/payments";
 import { listVehicles } from "@/lib/data/vehicles";
 import PageHeader from "@/components/dashboard/PageHeader";
 import AdminMetricCard from "@/components/admin/AdminMetricCard";
@@ -12,13 +14,16 @@ const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
 
 export default async function AdminOverviewPage() {
-  const [overview, series, livePayments, driversWeek, vehicles] = await Promise.all([
+  const [overview, series, livePayments, driversWeek, vehicles, paymentIssues] = await Promise.all([
     getFleetOverview(),
     getFleetRevenueSeries(14),
     getLivePayments(8),
     getDriversLast7Days(),
     listVehicles(),
+    getPaymentIssuesSummary(),
   ]);
+
+  const flaggedAlerts = paymentIssues.cardAlerts.filter((c) => c.flagged).length;
 
   const vehicleByDriver = Object.fromEntries(
     vehicles.filter((v) => v.driverId).map((v) => [v.driverId, v.vehicle])
@@ -30,6 +35,20 @@ export default async function AdminOverviewPage() {
         title="Overview"
         subtitle={new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
       />
+
+      {flaggedAlerts > 0 && (
+        <Link
+          href="/admin/payment-issues"
+          className="mb-6 flex items-center gap-3 rounded-2xl bg-red-50 border border-red-100 px-5 py-4 hover:bg-red-100/60 transition-colors"
+        >
+          <ShieldAlert className="w-5 h-5 text-red-600 shrink-0" />
+          <p className="text-sm text-red-700 flex-1">
+            <strong>{flaggedAlerts}</strong> repeat-card {flaggedAlerts === 1 ? "alert" : "alerts"} flagged with a
+            refund or void — worth a look.
+          </p>
+          <span className="text-sm font-semibold text-red-700 whitespace-nowrap">Review →</span>
+        </Link>
+      )}
 
       <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-6">
         <AdminMetricCard

@@ -7,6 +7,7 @@ import {
   LayoutGrid,
   Receipt,
   ClipboardCheck,
+  ShieldAlert,
   Users,
   Car,
   Settings,
@@ -23,6 +24,7 @@ const NAV = [
     items: [
       { href: "/admin", label: "Overview", icon: LayoutGrid, exact: true },
       { href: "/admin/payments", label: "Payments", icon: Receipt },
+      { href: "/admin/payment-issues", label: "Payment issues", icon: ShieldAlert },
       { href: "/admin/reconciliation", label: "Reconciliation", icon: ClipboardCheck },
     ],
   },

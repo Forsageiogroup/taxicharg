@@ -14,8 +14,8 @@ export default function AuthCard({ title, subtitle, children, footer }) {
             More fares in your pocket, faster than ever.
           </p>
           <p className="mt-4 text-white/60 max-w-sm">
-            Manage your payments, connect Clover &amp; Stripe, and track
-            every fare from one dashboard.
+            Manage your payments, connect your terminal and bank payouts,
+            and track every fare from one dashboard.
           </p>
         </div>
         <p className="relative text-xs text-white/40">

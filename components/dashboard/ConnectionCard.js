@@ -12,7 +12,6 @@ export default function ConnectionCard({
   connectHref,
   disconnectHref,
   configured,
-  envVarsNeeded = [],
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -45,8 +44,8 @@ export default function ConnectionCard({
 
       {!configured && (
         <p className="mt-3 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-          Not configured yet. Add {envVarsNeeded.join(" and ")} in your environment variables to
-          enable a live connection.
+          This isn&apos;t set up yet — contact TaxiCharg support to finish activating it on your
+          account.
         </p>
       )}
 

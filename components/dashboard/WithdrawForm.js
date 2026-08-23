@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Wallet, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Loader2, Wallet, AlertTriangle, CheckCircle2, HelpCircle } from "lucide-react";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
 
-export default function WithdrawForm({ availableBalance, stripeConnected }) {
+export default function WithdrawForm({ availableBalance, accountBalance, stripeConnected }) {
+  const [formOpen, setFormOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [showTip, setShowTip] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -30,6 +32,7 @@ export default function WithdrawForm({ availableBalance, stripeConnected }) {
       }
       setResult(data);
       setAmount("");
+      setFormOpen(false);
     } catch {
       setError("Could not reach the server. Please try again.");
     } finally {
@@ -38,64 +41,88 @@ export default function WithdrawForm({ availableBalance, stripeConnected }) {
   }
 
   return (
-    <div className="grid lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 sm:p-8">
+    <div className="space-y-6">
+      <div className="rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 sm:p-8">
         <div className="flex items-center gap-3">
-          <span className="w-11 h-11 rounded-xl brand-gradient flex items-center justify-center">
-            <Wallet className="w-5 h-5 text-white" />
-          </span>
-          <div>
-            <p className="text-sm text-navy-500">Available to withdraw</p>
-            <p className="text-2xl font-extrabold text-navy-900">{currency(availableBalance)}</p>
+          <button
+            onClick={() => setFormOpen((v) => !v)}
+            className="px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90"
+          >
+            Withdraw funds now
+          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onMouseEnter={() => setShowTip(true)}
+              onMouseLeave={() => setShowTip(false)}
+              onClick={() => setShowTip((v) => !v)}
+              className="w-8 h-8 rounded-full border border-navy-900/10 flex items-center justify-center text-navy-400 hover:text-orange-500"
+              aria-label="Withdrawal info"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </button>
+            {showTip && (
+              <div className="absolute left-0 top-10 w-64 rounded-xl bg-white card-shadow border border-navy-900/5 p-4 text-xs text-navy-600 z-10">
+                Only settled fares count toward what you can withdraw. Once your bank payouts are
+                connected, funds typically arrive in 1&ndash;2 business days. No withdrawal fees
+                from TaxiCharg.
+              </div>
+            )}
           </div>
         </div>
 
         {!stripeConnected && (
           <p className="mt-4 flex items-start gap-2 text-sm text-amber-700 bg-amber-50 rounded-lg px-4 py-3">
             <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
-            Stripe isn&apos;t connected yet, so withdrawals will run in demo mode. Connect Stripe
-            from the Connect tab to send real payouts to your bank.
+            Bank payouts aren&apos;t connected yet, so withdrawals will run in demo mode. Connect
+            them from your Profile to send real payouts to your bank.
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4 max-w-sm">
-          <div>
-            <label className="block text-sm font-medium text-navy-700 mb-1.5">Amount (AUD)</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-navy-400">$</span>
-              <input
-                required
-                type="number"
-                min="1"
-                step="0.01"
-                max={availableBalance}
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-navy-900/10 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                placeholder="0.00"
-              />
+        {formOpen && (
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4 max-w-sm">
+            <div>
+              <label className="block text-sm font-medium text-navy-700 mb-1.5">Amount (AUD)</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-navy-400">$</span>
+                <input
+                  required
+                  autoFocus
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  max={availableBalance}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-navy-900/10 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  placeholder="0.00"
+                />
+              </div>
+              <p className="mt-1.5 text-xs text-navy-400">
+                Available to withdraw: {currency(availableBalance)}
+              </p>
             </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={() => setAmount(String(availableBalance.toFixed(2)))}
-            className="text-xs font-semibold text-orange-500 hover:text-orange-600"
-          >
-            Withdraw full balance
-          </button>
+            <button
+              type="button"
+              onClick={() => setAmount(String(availableBalance.toFixed(2)))}
+              className="text-xs font-semibold text-orange-500 hover:text-orange-600"
+            >
+              Withdraw full balance
+            </button>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading || !amount}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90 disabled:opacity-60"
-          >
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            Withdraw {amount ? currency(Number(amount) || 0) : ""}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading || !amount}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90 disabled:opacity-60"
+            >
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+              Confirm withdrawal
+            </button>
+          </form>
+        )}
 
         {result && (
           <div className="mt-6 flex items-start gap-3 rounded-xl bg-green-50 text-green-700 px-4 py-3 text-sm">
@@ -112,14 +139,15 @@ export default function WithdrawForm({ availableBalance, stripeConnected }) {
         )}
       </div>
 
-      <div className="rounded-2xl bg-navy-950/[0.02] border border-navy-900/5 p-6">
-        <h3 className="font-bold text-navy-900 text-sm">How withdrawals work</h3>
-        <ul className="mt-3 space-y-3 text-sm text-navy-600">
-          <li>Only settled fares count toward your available balance.</li>
-          <li>Connected via Stripe: funds arrive in 1&ndash;2 business days.</li>
-          <li>Not yet connected: withdrawals run in demo mode until Stripe is linked.</li>
-          <li>No withdrawal fees from TaxiCharg.</li>
-        </ul>
+      <div className="rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-navy-900 font-bold">
+            <Wallet className="w-4 h-4" /> Your account
+          </div>
+          <span className="text-sm text-navy-500 mt-2 block">Account balance</span>
+          <div className="mt-1 text-2xl font-extrabold text-navy-900">{currency(accountBalance)}</div>
+          <p className="text-xs text-navy-400 mt-1">Money in your account pending withdrawal</p>
+        </div>
       </div>
     </div>
   );

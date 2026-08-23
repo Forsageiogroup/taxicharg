@@ -4,6 +4,7 @@ import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
 import { findDriverById } from "@/lib/data/drivers";
 import { getDriverSummary } from "@/lib/data/payments";
 import { createPayout, isStripeConfigured } from "@/lib/stripe";
+import { recordWithdrawal } from "@/lib/data/withdrawals";
 
 export async function POST(request) {
   const cookieStore = await cookies();
@@ -32,11 +33,14 @@ export async function POST(request) {
         accountId: driver.connections.stripe.accountId,
         amount,
       });
+      await recordWithdrawal(driver.id, { amount, status: "processing" });
       return NextResponse.json({ ok: true, mode: "live", payout });
     } catch (err) {
       return NextResponse.json({ error: err.message || "Payout failed." }, { status: 502 });
     }
   }
+
+  await recordWithdrawal(driver.id, { amount, status: "processing" });
 
   return NextResponse.json({
     ok: true,

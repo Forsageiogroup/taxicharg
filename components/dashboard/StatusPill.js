@@ -2,6 +2,8 @@ const STYLES = {
   settled: "bg-green-50 text-green-700",
   active: "bg-green-50 text-green-700",
   connected: "bg-green-50 text-green-700",
+  paid: "bg-green-50 text-green-700",
+  processing: "bg-amber-50 text-amber-700",
   pending: "bg-amber-50 text-amber-700",
   suspended: "bg-red-50 text-red-700",
   disconnected: "bg-navy-950/[0.05] text-navy-500",

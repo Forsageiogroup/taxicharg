@@ -7,12 +7,12 @@ const FAQS = [
     a: "Most EFTPOS and card fares settle within 24 hours. You'll see them move from \"Pending\" to \"Settled\" on your Payments tab.",
   },
   {
-    q: "How do I connect my Clover terminal?",
-    a: "Go to the Connect tab and click \"Connect Clover\". You'll be sent to Clover to authorise TaxiCharg — once approved you're brought straight back to your dashboard.",
+    q: "How do I connect my EFTPOS terminal?",
+    a: "Go to your Profile, open \"Manage payment connections\", and click \"Connect EFTPOS Terminal\". You'll be asked to authorise TaxiCharg — once approved you're brought straight back to your dashboard.",
   },
   {
-    q: "Why do I need to connect Stripe?",
-    a: "Stripe is how TaxiCharg sends your settled earnings to your own bank account. Without it, withdrawals run in demo mode only.",
+    q: "Why do I need to connect Bank Payouts?",
+    a: "That's how TaxiCharg sends your settled earnings to your own bank account. Without it, withdrawals run in demo mode only.",
   },
   {
     q: "Is there a fee to withdraw funds?",

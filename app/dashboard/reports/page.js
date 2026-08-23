@@ -1,23 +1,78 @@
 import { cookies } from "next/headers";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
-import { getWeeklyReport, getMethodBreakdown } from "@/lib/data/reports";
+import { findDriverById } from "@/lib/data/drivers";
+import { getPeriodMetrics, getWeeklyReport, getMethodBreakdown } from "@/lib/data/reports";
 import PageHeader from "@/components/dashboard/PageHeader";
+import MetricCard from "@/components/dashboard/MetricCard";
 import BarChart from "@/components/dashboard/BarChart";
+import DateRangePicker from "@/components/dashboard/DateRangePicker";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
 
-export default async function ReportsPage() {
+function todayISO(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().slice(0, 10);
+}
+
+export default async function ReportsPage({ searchParams }) {
+  const params = await searchParams;
+  const from = params?.from || todayISO(-30);
+  const to = params?.to || todayISO();
+
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
-  const weekly = await getWeeklyReport(session.sub);
-  const methods = await getMethodBreakdown(session.sub);
+  const driver = await findDriverById(session.sub);
+
+  const metrics = await getPeriodMetrics(driver.id, { from, to });
+  const weekly = await getWeeklyReport(driver.id);
+  const methods = await getMethodBreakdown(driver.id);
 
   return (
     <div>
-      <PageHeader title="Reports" subtitle="Earnings trends over the last 12 weeks." />
+      <PageHeader
+        title="Report"
+        action={<DateRangePicker from={from} to={to} />}
+      />
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <h2 className="font-bold text-navy-900 mb-4">Key metrics</h2>
+      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <MetricCard label="Total face value" value={currency(metrics.faceValue)} />
+        <MetricCard label="Total commission" value={currency(metrics.commission)} />
+        <MetricCard label="Transactions" value={metrics.transactions} />
+        <MetricCard label="Total fees paid" value={currency(metrics.feesPaid)} />
+      </div>
+
+      <div className="mt-6 rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 sm:p-8">
+        <dl className="divide-y divide-navy-900/5">
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-navy-500">Fees</dt>
+            <dd className="font-semibold text-navy-900">{currency(metrics.feesPaid)}</dd>
+          </div>
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-navy-500">Refunds</dt>
+            <dd className="font-semibold text-navy-900">{currency(metrics.refunds)}</dd>
+          </div>
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-navy-500">Total fees &amp; refunds</dt>
+            <dd className="font-semibold text-navy-900">{currency(metrics.totalFeesAndRefunds)}</dd>
+          </div>
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-navy-700 font-semibold">Amount settled</dt>
+            <dd className="font-bold text-green-600">{currency(metrics.amountSettled)}</dd>
+          </div>
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-navy-500">
+              Account balance
+              <span className="block text-xs text-navy-400 font-normal">Money in your account pending withdrawal</span>
+            </dt>
+            <dd className="font-bold text-navy-900">{currency(driver.balance)}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div className="mt-8 grid lg:grid-cols-2 gap-6">
         <div className="rounded-2xl bg-white border border-navy-900/5 card-shadow p-6">
           <h2 className="font-bold text-navy-900 mb-5">Earnings by payment method</h2>
           <BarChart data={methods} labelKey="method" valueKey="total" formatValue={currency} />
@@ -31,44 +86,6 @@ export default async function ReportsPage() {
             valueKey="total"
             formatValue={currency}
           />
-        </div>
-      </div>
-
-      <div className="mt-6 rounded-2xl bg-white border border-navy-900/5 card-shadow overflow-hidden">
-        <div className="px-6 py-4 border-b border-navy-900/5">
-          <h2 className="font-bold text-navy-900">Weekly breakdown</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-navy-400 border-b border-navy-900/5">
-                <th className="px-6 py-3 font-medium">Week starting</th>
-                <th className="px-6 py-3 font-medium">Trips</th>
-                <th className="px-6 py-3 font-medium">Fares</th>
-                <th className="px-6 py-3 font-medium">Tips</th>
-                <th className="px-6 py-3 font-medium">Fees</th>
-                <th className="px-6 py-3 font-medium">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {weekly.map((w) => (
-                <tr key={w.weekStarting} className="border-b border-navy-900/5 last:border-0">
-                  <td className="px-6 py-3 text-navy-700">
-                    {new Date(w.weekStarting).toLocaleDateString("en-AU", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                  <td className="px-6 py-3 text-navy-700">{w.trips}</td>
-                  <td className="px-6 py-3 text-navy-700">{currency(w.fares)}</td>
-                  <td className="px-6 py-3 text-navy-700">{currency(w.tips)}</td>
-                  <td className="px-6 py-3 text-navy-400">-{currency(w.fees)}</td>
-                  <td className="px-6 py-3 font-semibold text-navy-900">{currency(w.total)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import {
   Receipt,
   BarChart3,
   Wallet,
-  Plug,
+  UserCircle,
   HelpCircle,
   LogOut,
   Menu,
@@ -18,10 +18,17 @@ import Logo from "@/components/site/Logo";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", icon: LayoutGrid, exact: true },
-  { href: "/dashboard/payments", label: "Payments", icon: Receipt },
+  {
+    label: "Payments",
+    icon: Receipt,
+    children: [
+      { href: "/dashboard/payments/transactions", label: "Transactions" },
+      { href: "/dashboard/payments/settlements", label: "Settlements" },
+    ],
+  },
   { href: "/dashboard/reports", label: "Reports", icon: BarChart3 },
   { href: "/dashboard/withdraw", label: "Withdraw funds", icon: Wallet },
-  { href: "/dashboard/connect", label: "Connect (Clover & Stripe)", icon: Plug },
+  { href: "/dashboard/profile", label: "Profile", icon: UserCircle },
   { href: "/dashboard/help", label: "Help", icon: HelpCircle },
 ];
 
@@ -45,12 +52,47 @@ export default function DashboardShell({ driver, children }) {
 
   const NavList = ({ onNavigate }) => (
     <nav className="flex-1 px-3 space-y-1">
-      {NAV.map(({ href, label, icon: Icon, exact }) => {
-        const active = exact ? pathname === href : pathname.startsWith(href);
+      {NAV.map((item) => {
+        if (item.children) {
+          const groupActive = item.children.some((c) => pathname.startsWith(c.href));
+          return (
+            <div key={item.label} className="pt-1">
+              <div
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+                  groupActive ? "text-white" : "text-white/60"
+                }`}
+              >
+                <item.icon className="w-4.5 h-4.5 shrink-0" />
+                <span>{item.label}</span>
+              </div>
+              <div className="ml-6 border-l border-white/10 pl-4 space-y-1 mb-1">
+                {item.children.map((c) => {
+                  const active = pathname.startsWith(c.href);
+                  return (
+                    <Link
+                      key={c.href}
+                      href={c.href}
+                      onClick={onNavigate}
+                      className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-white/10 text-white"
+                          : "text-white/50 hover:text-white hover:bg-white/5"
+                      }`}
+                    >
+                      {c.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
         return (
           <Link
-            key={href}
-            href={href}
+            key={item.href}
+            href={item.href}
             onClick={onNavigate}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
               active
@@ -58,8 +100,8 @@ export default function DashboardShell({ driver, children }) {
                 : "text-white/60 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Icon className="w-4.5 h-4.5 shrink-0" />
-            <span>{label}</span>
+            <item.icon className="w-4.5 h-4.5 shrink-0" />
+            <span>{item.label}</span>
           </Link>
         );
       })}

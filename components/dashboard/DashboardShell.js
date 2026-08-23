@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Logo from "@/components/site/Logo";
 import IdleTimeout from "./IdleTimeout";
+import SessionWatcher from "./SessionWatcher";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", icon: LayoutGrid, exact: true },
@@ -112,6 +113,7 @@ export default function DashboardShell({ driver, children }) {
   return (
     <div className="min-h-screen flex bg-navy-950/[0.02]">
       <IdleTimeout />
+      <SessionWatcher />
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-72 navy-gradient text-white shrink-0">
         <div className="h-16 flex items-center px-6 border-b border-white/10">

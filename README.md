@@ -15,15 +15,18 @@ misconfigure; everything is compiled and hashed automatically.
   `/support/*`, `/legal/*`) &mdash; styled to match the TaxiCharg brand
   (colors sampled from your logo), structured after taxi1.com.au but with
   original TaxiCharg copy.
-- **Driver login/signup** (`/login`, `/signup`) with a demo account, ready
-  to swap for a real database.
-- **Driver dashboard** (`/dashboard`) with Overview, Payments, Reports,
-  Withdraw Funds, Connect (Clover & Stripe), and Help tabs.
+- **Driver login/signup** (`/login`, `/signup`) backed by a real Postgres
+  database, with a demo account seeded in for zero-setup testing.
+- **Driver dashboard** (`/dashboard`) with Overview, Payments (Transactions
+  & Settlements), Reports, Withdraw Funds, Profile, Connect (Clover &
+  Stripe), and Help tabs.
 - **Clover & Stripe "plugin"** &mdash; real OAuth connect flows
   (`/api/clover/*`, `/api/stripe/*`) that work as soon as you add your API
   keys as environment variables. Until then they run in demo mode.
-- **Admin back-office** (`/admin`) &mdash; a driver list and per-driver
-  detail view, separate login from the driver dashboard.
+- **Admin back-office** (`/admin`) &mdash; Overview, Payments,
+  Reconciliation, Drivers (create/reset password/disable), Vehicles &
+  terminals, and Settings & status, all separate login from the driver
+  dashboard.
 
 ## Demo logins
 
@@ -32,18 +35,50 @@ misconfigure; everything is compiled and hashed automatically.
 | Driver | driver@taxicharg.com.au       | TaxiCharg123   |
 | Admin  | admin@taxicharg.com.au        | AdminTaxi123   |
 
-These are hardcoded in `lib/data/drivers.js` for demoing the product with
-zero setup. See **Going live** below for wiring up real accounts.
+Both are seeded into the database by `npm run db:seed` (see **Database**
+below) — see `scripts/seed.mjs` to change them or add more.
 
 ## Local development
 
 ```bash
 npm install
 cp .env.example .env.local   # fill in values as you get them (see below)
+npm run db:migrate           # create the database tables (see Database below)
+npm run db:seed              # load the demo drivers/vehicles/withdrawal history
 npm run dev
 ```
 
 Open http://localhost:3000.
+
+## Database
+
+Driver accounts, vehicle/terminal assignments, and withdrawal history are
+stored in a real Postgres database — this is what makes profile edits,
+Clover/Stripe connection status, admin-created drivers, and withdrawals
+actually stick around, instead of resetting every time the app restarts.
+(Trip/payment history in `lib/data/payments.js` is still generated demo
+data for now, since nothing writes to it yet — see that file's comments.)
+
+**Local development:** any Postgres server works. Point `POSTGRES_URL` (or
+`DATABASE_URL`) in `.env.local` at it, e.g.
+`postgres://user:password@localhost:5432/taxicharg`, then run
+`npm run db:migrate` once to create the tables and `npm run db:seed` once
+to load the demo accounts. Both are safe to run again later — they never
+overwrite existing data.
+
+**On Vercel:** open your project → **Storage** tab → **Create Database** →
+choose **Postgres**. Vercel connects it to your project and adds the
+`POSTGRES_URL` environment variable for you automatically — you don't
+type in a connection string yourself. After it's connected:
+
+1. Redeploy (so the new env var takes effect).
+2. Run the migration and seed once against that database. The simplest
+   way without installing anything extra: in Vercel → your project →
+   Storage → your database → **Query** tab, paste the contents of
+   `lib/db/schema.sql` and run it — that's the migration. Then run
+   `node scripts/seed.mjs` from your own machine with `POSTGRES_URL` set
+   to the connection string shown in that same Storage tab (or ask
+   Claude to do this step with you).
 
 ## Deploying: GitHub → Vercel
 
@@ -51,22 +86,29 @@ Open http://localhost:3000.
 2. In Vercel, "Add New Project" → import that repository. Vercel
    auto-detects Next.js, so the default build settings work as-is
    (build command `next build`, output handled automatically).
-3. In the Vercel project's **Settings → Environment Variables**, add the
-   variables from `.env.example` (at minimum `AUTH_SECRET` and
+3. Add a Postgres database from the **Storage** tab (see **Database**
+   above) — this sets `POSTGRES_URL` for you.
+4. In the Vercel project's **Settings → Environment Variables**, add the
+   remaining variables from `.env.example` (at minimum `AUTH_SECRET` and
    `NEXT_PUBLIC_APP_URL` — set the latter to your real Vercel/production
    URL once you know it).
-4. Deploy. Every push to your main branch redeploys automatically.
+5. Deploy. Every push to your main branch redeploys automatically.
+6. Run the migration + seed once against the new database (see
+   **Database** above).
 
 ## Environment variables
 
-See `.env.example` for the full list with explanations. Nothing is
-required to demo the site — mock data and demo logins work out of the
-box. To enable real Clover/Stripe connections, add:
+See `.env.example` for the full list with explanations.
 
+- `POSTGRES_URL` (or `DATABASE_URL`) — your Postgres connection string;
+  see **Database** above. Required for login/dashboard/admin pages to work
+  at all once you've moved past local dev with a database already running.
 - `CLOVER_APP_ID`, `CLOVER_APP_SECRET`, `CLOVER_ENV` — from your app in
   the [Clover developer dashboard](https://www.clover.com/developers).
+  Optional — Clover connect runs in demo mode until these are set.
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` — from your
-  [Stripe dashboard](https://dashboard.stripe.com/apikeys).
+  [Stripe dashboard](https://dashboard.stripe.com/apikeys). Optional, same
+  as above.
 - `AUTH_SECRET` — any long random string (`openssl rand -base64 32`),
   used to sign login sessions.
 - `NEXT_PUBLIC_APP_URL` — your deployed URL, used to build OAuth redirect
@@ -80,44 +122,53 @@ app/                     Pages & API routes (Next.js App Router)
   login/, signup/          Driver auth pages
   dashboard/               Driver dashboard (protected)
     connect/                Clover & Stripe connect UI
-    payments/ reports/ withdraw/ help/
+    payments/ reports/ withdraw/ profile/ help/
   admin/                    Admin back-office (protected, separate login)
+    (dashboard)/             Overview, payments/, reconciliation/, drivers/, vehicles/, settings/
   api/
     auth/                   Driver login/logout/session
     admin/auth/              Admin login/logout
+    admin/drivers/            Create driver, reset password, disable/enable
+    admin/vehicles/           Create vehicle, assign driver
     clover/                  Clover OAuth connect + callback
     stripe/                  Stripe Connect onboarding + callback + webhook
     driver/withdraw/         Withdraw funds endpoint
+    driver/profile/           Edit plate/ABN
 
 components/               UI components (site/ marketing, dashboard/, admin/)
 
 lib/
   auth.js                  Session cookies + signed OAuth state (JWT via `jose`)
+  db.js                    Postgres connection pool (reads POSTGRES_URL/DATABASE_URL)
+  demoCredentials.js        Demo login constants (kept dependency-free — see its comment)
   clover.js                Clover OAuth helper functions
   stripe.js                Stripe Connect helper functions
-  data/                    ⭐ MOCK DATA LAYER — see below
-    drivers.js               Driver records, credentials, connections
-    payments.js               Generated transaction ledger
-    reports.js                 Weekly/method aggregates
+  db/schema.sql             Database schema (drivers, vehicles, withdrawals)
+  data/                    ⭐ DATA LAYER — see below
+    drivers.js               Driver records, credentials, connections (Postgres)
+    vehicles.js               Vehicle/terminal assignments (Postgres)
+    withdrawals.js            Withdrawal history (Postgres)
+    payments.js               Generated transaction ledger (still demo data)
+    reports.js                 Aggregates — driver-level and fleet-wide
+
+scripts/
+  migrate.mjs               Creates the database tables — run once (npm run db:migrate)
+  seed.mjs                   Loads demo drivers/vehicles/withdrawal history — run once (npm run db:seed)
 ```
 
-### The mock data layer — and going live with a real database
+### The data layer
 
-Every page and API route reads driver/payment data through the functions
-in `lib/data/*.js`, never directly. Right now those functions return data
-from in-memory arrays (`lib/data/drivers.js`) or a generated ledger
-(`lib/data/payments.js`) — enough to demo the whole product with zero
-setup, but it resets whenever the server restarts.
+Every page and API route reads driver/vehicle/withdrawal data through the
+functions in `lib/data/*.js`, never directly — those functions now query a
+real Postgres database (see **Database** above), so the same function
+names and return shapes are preserved for anything that swaps providers
+later. Trip/payment history (`lib/data/payments.js`) is still deterministic
+generated demo data, since nothing writes to it yet — the natural next
+step there is syncing real transactions from Clover/Stripe.
 
-To connect a real database (Supabase is a good fit — free tier, works
-well with Vercel):
-
-1. Create the equivalent tables (`drivers`, `transactions`, etc.).
-2. Rewrite the functions inside `lib/data/*.js` to query that database
-   instead of the in-memory arrays — **keep the same function names and
-   return shapes** so nothing else in the app needs to change.
-3. Replace the plaintext password check in `verifyDriverPassword` with a
-   real hash comparison (bcrypt/argon2) once drivers are stored for real.
+One thing worth doing before real drivers sign up: replace the plaintext
+password check in `verifyDriverPassword` (`lib/data/drivers.js`) with a
+real hash comparison (bcrypt/argon2).
 
 ## The Clover & Stripe "plugin"
 

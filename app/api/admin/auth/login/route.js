@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { DEMO_ADMIN_CREDENTIALS } from "@/lib/data/drivers";
+import { DEMO_ADMIN_CREDENTIALS } from "@/lib/demoCredentials";
 import { createSessionToken, sessionCookieOptions, ADMIN_COOKIE } from "@/lib/auth";
 
 export async function POST(request) {

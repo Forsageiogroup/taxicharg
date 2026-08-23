@@ -17,6 +17,15 @@ export async function POST(request) {
     return NextResponse.json({ error: "Name and email are required." }, { status: 400 });
   }
 
-  const { driver, tempPassword } = await createDriver(body);
-  return NextResponse.json({ ok: true, driver, tempPassword });
+  try {
+    const { driver, tempPassword } = await createDriver(body);
+    return NextResponse.json({ ok: true, driver, tempPassword });
+  } catch (err) {
+    if (err?.code === "23505") {
+      // Postgres unique_violation — email already in use.
+      return NextResponse.json({ error: "A driver with that email already exists." }, { status: 409 });
+    }
+    console.error("[admin create driver]", err);
+    return NextResponse.json({ error: "Could not create driver." }, { status: 500 });
+  }
 }

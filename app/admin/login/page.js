@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Info, Loader2, ShieldCheck } from "lucide-react";
 import AuthCard from "@/components/site/AuthCard";
-import { DEMO_ADMIN_CREDENTIALS } from "@/lib/data/drivers";
+import { DEMO_ADMIN_CREDENTIALS } from "@/lib/demoCredentials";
 
 export default function AdminLoginPage() {
   const router = useRouter();

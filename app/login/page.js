@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Info, Loader2 } from "lucide-react";
 import AuthCard from "@/components/site/AuthCard";
-import { DEMO_DRIVER_CREDENTIALS } from "@/lib/data/drivers";
+import { DEMO_DRIVER_CREDENTIALS } from "@/lib/demoCredentials";
 
 function LoginForm() {
   const router = useRouter();

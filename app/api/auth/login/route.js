@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { verifyDriverPassword } from "@/lib/data/drivers";
+import { verifyDriverPassword, setDriverSessionId } from "@/lib/data/drivers";
 import { createSessionToken, sessionCookieOptions, DRIVER_COOKIE } from "@/lib/auth";
 
 export async function POST(request) {
@@ -20,7 +20,13 @@ export async function POST(request) {
     );
   }
 
-  const token = await createSessionToken({ sub: driver.id, email: driver.email, role: "driver" });
+  // One active login at a time: claim a fresh session ID for this
+  // sign-in and embed it in the token. Any device already signed in
+  // with an older session ID gets signed out next time it loads a page.
+  const sessionId = crypto.randomUUID();
+  await setDriverSessionId(driver.id, sessionId);
+
+  const token = await createSessionToken({ sub: driver.id, email: driver.email, role: "driver", sid: sessionId });
   const cookieStore = await cookies();
   cookieStore.set(DRIVER_COOKIE, token, sessionCookieOptions);
 

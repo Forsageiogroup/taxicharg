@@ -13,6 +13,11 @@ export default async function DashboardLayout({ children }) {
   const driver = await findDriverById(session.sub);
   if (!driver) redirect("/login");
 
+  // One active login at a time: if this token's session ID doesn't match
+  // the one currently on the driver's record, a newer login happened on
+  // another device/terminal — sign this one out.
+  if (session.sid !== driver.sessionId) redirect("/api/auth/session-replaced");
+
   const { password, ...safeDriver } = driver;
 
   return <DashboardShell driver={safeDriver}>{children}</DashboardShell>;

@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifySessionToken, signState, DRIVER_COOKIE } from "@/lib/auth";
+import { signState } from "@/lib/auth";
+import { requireDriverSession } from "@/lib/driverSession";
 import { isCloverConfigured, getAuthorizeUrl } from "@/lib/clover";
 
 export async function GET(request) {
-  const cookieStore = await cookies();
-  const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
-  if (!session) return NextResponse.redirect(new URL("/login", request.url));
+  const auth = await requireDriverSession();
+  if (!auth) return NextResponse.redirect(new URL("/login", request.url));
 
   if (!isCloverConfigured()) {
     const url = new URL("/dashboard/connect", request.url);
@@ -14,6 +13,6 @@ export async function GET(request) {
     return NextResponse.redirect(url);
   }
 
-  const state = await signState({ driverId: session.sub });
+  const state = await signState({ driverId: auth.session.sub });
   return NextResponse.redirect(getAuthorizeUrl(state));
 }

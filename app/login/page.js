@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Info, Loader2 } from "lucide-react";
+import { Info, Loader2, ShieldAlert } from "lucide-react";
 import AuthCard from "@/components/site/AuthCard";
 import { DEMO_DRIVER_CREDENTIALS } from "@/lib/demoCredentials";
 
@@ -55,6 +55,13 @@ function LoginForm() {
         </>
       }
     >
+      {params.get("reason") === "session-replaced" && (
+        <div className="mb-4 flex items-start gap-2.5 rounded-lg bg-amber-50 text-amber-800 px-3.5 py-3 text-sm">
+          <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>You were signed out because this account was signed in on another device or terminal.</span>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">Email</label>
@@ -89,6 +96,10 @@ function LoginForm() {
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
           Log in
         </button>
+
+        <p className="text-xs text-navy-400 text-center">
+          For your security, this account can only be signed in on one device at a time.
+        </p>
       </form>
 
       <button

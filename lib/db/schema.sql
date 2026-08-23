@@ -24,6 +24,12 @@ CREATE TABLE IF NOT EXISTS drivers (
   status           TEXT NOT NULL DEFAULT 'active',
   balance          NUMERIC(10, 2) NOT NULL DEFAULT 0,
   joined_at        DATE NOT NULL DEFAULT CURRENT_DATE,
+  -- Set to a fresh random value on every successful login. A session's
+  -- JWT carries the value it was issued with, so if a later login
+  -- changes this, that earlier session stops matching and is signed out
+  -- next time it loads a page — enforces "one device at a time" without
+  -- needing a separate sessions table.
+  session_id       TEXT,
   -- { clover: { connected, merchantId, connectedAt },
   --   stripe: { connected, accountId, payoutsEnabled, connectedAt } }
   connections      JSONB NOT NULL DEFAULT '{
@@ -53,3 +59,7 @@ CREATE TABLE IF NOT EXISTS withdrawals (
 
 CREATE INDEX IF NOT EXISTS idx_vehicles_driver_id ON vehicles(driver_id);
 CREATE INDEX IF NOT EXISTS idx_withdrawals_driver_id ON withdrawals(driver_id);
+
+-- Added after the initial migration — safe to re-run against a database
+-- that was created before this column existed.
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS session_id TEXT;

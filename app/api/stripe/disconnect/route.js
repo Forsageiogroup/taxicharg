@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
+import { requireDriverSession } from "@/lib/driverSession";
 import { updateDriverConnection } from "@/lib/data/drivers";
 
 export async function POST() {
-  const cookieStore = await cookies();
-  const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
-  if (!session) return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
+  const auth = await requireDriverSession();
+  if (!auth) return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
 
-  await updateDriverConnection(session.sub, "stripe", {
+  await updateDriverConnection(auth.session.sub, "stripe", {
     connected: false,
     accountId: null,
     payoutsEnabled: false,

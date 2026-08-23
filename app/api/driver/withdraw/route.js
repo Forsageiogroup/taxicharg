@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
-import { findDriverById } from "@/lib/data/drivers";
+import { requireDriverSession } from "@/lib/driverSession";
 import { getDriverSummary } from "@/lib/data/payments";
 import { createPayout, isStripeConfigured } from "@/lib/stripe";
 import { recordWithdrawal } from "@/lib/data/withdrawals";
 
 export async function POST(request) {
-  const cookieStore = await cookies();
-  const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
-  if (!session) return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
+  const auth = await requireDriverSession();
+  if (!auth) return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
+  const { driver } = auth;
 
   const body = await request.json().catch(() => null);
   const amount = Number(body?.amount);
@@ -17,7 +15,6 @@ export async function POST(request) {
     return NextResponse.json({ error: "Enter a valid amount." }, { status: 400 });
   }
 
-  const driver = await findDriverById(session.sub);
   const summary = await getDriverSummary(driver.id);
 
   if (amount > summary.availableBalance + 0.01) {

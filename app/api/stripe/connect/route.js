@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
-import { findDriverById, updateDriverConnection } from "@/lib/data/drivers";
+import { requireDriverSession } from "@/lib/driverSession";
+import { updateDriverConnection } from "@/lib/data/drivers";
 import { isStripeConfigured, createOnboardingLink } from "@/lib/stripe";
 
 export async function GET(request) {
-  const cookieStore = await cookies();
-  const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
-  if (!session) return NextResponse.redirect(new URL("/login", request.url));
+  const auth = await requireDriverSession();
+  if (!auth) return NextResponse.redirect(new URL("/login", request.url));
+  const { driver } = auth;
 
   const redirectUrl = new URL("/dashboard/connect", request.url);
 
@@ -15,8 +14,6 @@ export async function GET(request) {
     redirectUrl.searchParams.set("stripe", "not_configured");
     return NextResponse.redirect(redirectUrl);
   }
-
-  const driver = await findDriverById(session.sub);
 
   try {
     const { accountId, url } = await createOnboardingLink({

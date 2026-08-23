@@ -21,7 +21,7 @@ export default async function AdminDriverDetailPage({ params }) {
 
   return (
     <div>
-      <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-navy-500 hover:text-orange-600 mb-4">
+      <Link href="/admin/drivers" className="inline-flex items-center gap-2 text-sm text-navy-500 hover:text-orange-600 mb-4">
         <ArrowLeft className="w-4 h-4" /> Back to drivers
       </Link>
 

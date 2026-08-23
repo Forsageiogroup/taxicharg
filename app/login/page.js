@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Info, Loader2, ShieldAlert } from "lucide-react";
+import { Clock, Info, Loader2, ShieldAlert } from "lucide-react";
 import AuthCard from "@/components/site/AuthCard";
 import { DEMO_DRIVER_CREDENTIALS } from "@/lib/demoCredentials";
 
@@ -59,6 +59,13 @@ function LoginForm() {
         <div className="mb-4 flex items-start gap-2.5 rounded-lg bg-amber-50 text-amber-800 px-3.5 py-3 text-sm">
           <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
           <span>You were signed out because this account was signed in on another device or terminal.</span>
+        </div>
+      )}
+
+      {params.get("reason") === "idle-timeout" && (
+        <div className="mb-4 flex items-start gap-2.5 rounded-lg bg-navy-950/[0.05] text-navy-700 px-3.5 py-3 text-sm">
+          <Clock className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>You were signed out after 10 minutes of inactivity, for your security.</span>
         </div>
       )}
 

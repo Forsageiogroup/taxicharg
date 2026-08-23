@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import StatusPill from "@/components/dashboard/StatusPill";
+import EditTerminalModal from "./EditTerminalModal";
 
 export default function VehiclesTable({ vehicles, driverOptions }) {
   const router = useRouter();
@@ -31,6 +32,7 @@ export default function VehiclesTable({ vehicles, driverOptions }) {
               <th className="px-6 py-3 font-medium">Vehicle</th>
               <th className="px-6 py-3 font-medium">Rego</th>
               <th className="px-6 py-3 font-medium">Terminal</th>
+              <th className="px-6 py-3 font-medium">Provider</th>
               <th className="px-6 py-3 font-medium">Terminal health</th>
               <th className="px-6 py-3 font-medium">Assigned driver</th>
             </tr>
@@ -41,6 +43,21 @@ export default function VehiclesTable({ vehicles, driverOptions }) {
                 <td className="px-6 py-3.5 font-semibold text-navy-900">{v.vehicle}</td>
                 <td className="px-6 py-3.5 text-navy-600">{v.rego}</td>
                 <td className="px-6 py-3.5 text-navy-600">{v.terminalId}</td>
+                <td className="px-6 py-3.5">
+                  <div className="flex items-center gap-1.5">
+                    <div>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-navy-950/[0.05] text-navy-700">
+                        {v.provider}
+                      </span>
+                      {v.merchantRef && (
+                        <p className="mt-1 text-[11px] text-navy-400 font-mono truncate max-w-[10rem]">
+                          {v.merchantRef}
+                        </p>
+                      )}
+                    </div>
+                    <EditTerminalModal vehicle={v} />
+                  </div>
+                </td>
                 <td className="px-6 py-3.5">
                   <span className="inline-flex items-center gap-2">
                     <StatusPill status={v.health.status === "active" ? "connected" : "disconnected"} />
@@ -66,7 +83,7 @@ export default function VehiclesTable({ vehicles, driverOptions }) {
             ))}
             {vehicles.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-navy-400">
+                <td colSpan={6} className="px-6 py-10 text-center text-navy-400">
                   No vehicles yet.
                 </td>
               </tr>

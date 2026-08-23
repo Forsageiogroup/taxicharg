@@ -135,10 +135,10 @@ const drivers = [
 ];
 
 const vehicles = [
-  { id: "veh_001", vehicle: "CAB 101", rego: "NSW-TX01", terminalId: "TC-CAB-101", driverId: "drv_001" },
-  { id: "veh_002", vehicle: "CAB 102", rego: "NSW-TX02", terminalId: "TC-CAB-102", driverId: "drv_002" },
-  { id: "veh_003", vehicle: "CAB 103", rego: "NSW-TX03", terminalId: "TC-CAB-103", driverId: "drv_003" },
-  { id: "veh_004", vehicle: "CAB 104", rego: "NSW-TX04", terminalId: "TC-CAB-104", driverId: "drv_004" },
+  { id: "veh_001", vehicle: "CAB 101", rego: "NSW-TX01", terminalId: "TC-CAB-101", driverId: "drv_001", provider: "Clover", merchantRef: "CLV-77410" },
+  { id: "veh_002", vehicle: "CAB 102", rego: "NSW-TX02", terminalId: "TC-CAB-102", driverId: "drv_002", provider: "Clover", merchantRef: "" },
+  { id: "veh_003", vehicle: "CAB 103", rego: "NSW-TX03", terminalId: "TC-CAB-103", driverId: "drv_003", provider: "Tyro", merchantRef: "TYR-84021" },
+  { id: "veh_004", vehicle: "CAB 104", rego: "NSW-TX04", terminalId: "TC-CAB-104", driverId: "drv_004", provider: "Clover", merchantRef: "" },
 ];
 
 async function main() {
@@ -173,10 +173,10 @@ async function main() {
 
   for (const v of vehicles) {
     await pool.query(
-      `INSERT INTO vehicles (id, vehicle, rego, terminal_id, driver_id)
-       VALUES ($1,$2,$3,$4,$5)
+      `INSERT INTO vehicles (id, vehicle, rego, terminal_id, driver_id, provider, merchant_ref)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
        ON CONFLICT (id) DO NOTHING`,
-      [v.id, v.vehicle, v.rego, v.terminalId, v.driverId]
+      [v.id, v.vehicle, v.rego, v.terminalId, v.driverId, v.provider, v.merchantRef]
     );
   }
   console.log(`Seeded ${vehicles.length} vehicles (skipped any that already existed).`);

@@ -38,12 +38,17 @@ export default async function AdminSettingsPage() {
   const cloverConnected = drivers.filter((d) => d.connections.clover.connected).length;
   const stripeConnected = drivers.filter((d) => d.connections.stripe.connected).length;
 
+  const providerCounts = vehicles.reduce((acc, v) => {
+    acc[v.provider] = (acc[v.provider] || 0) + 1;
+    return acc;
+  }, {});
+
   const CHECKLIST = [
     { done: cloverOn, label: "Clover API keys", detail: "CLOVER_APP_ID / CLOVER_APP_SECRET set in Vercel" },
     { done: stripeOn, label: "Stripe API keys", detail: "STRIPE_SECRET_KEY set in Vercel" },
     { done: true, label: "HTTPS domain", detail: "taxicharg.vercel.app (or your custom domain once connected)" },
     { done: false, label: "Real drivers & terminals", detail: "Replace demo accounts, assign each vehicle's terminal" },
-    { done: false, label: "Real database", detail: "Swap the in-memory mock data layer for Postgres/Supabase" },
+    { done: true, label: "Real database", detail: "Drivers, vehicles & withdrawals are on Postgres (Neon) — live and persisted" },
     { done: false, label: "Parallel run", detail: "Pilot with 2–3 drivers; reconciliation must match your provider to the cent" },
   ];
 
@@ -88,9 +93,24 @@ export default async function AdminSettingsPage() {
           <Row label="Vehicles / terminals" value={vehicles.length} />
           <Row label="Payments booked" value={payments.length} />
           <p className="mt-3 text-xs text-navy-400">
-            All figures come from the in-memory demo data layer and reset when the app restarts — see the go-live
-            checklist below.
+            Drivers, vehicles and withdrawals are stored in Postgres and persist across restarts and redeploys.
+            Payments are still generated demo data — see the go-live checklist below.
           </p>
+        </div>
+
+        <div className="rounded-2xl bg-white border border-navy-900/5 card-shadow p-6">
+          <h2 className="font-bold text-navy-900 mb-1">Terminals by provider</h2>
+          <p className="text-xs text-navy-400 mb-3">
+            Admin-recorded, from each vehicle's Vehicles &amp; terminals entry — for cross-checking against that
+            company's own merchant portal, not a live connection.
+          </p>
+          {Object.keys(providerCounts).length === 0 ? (
+            <p className="text-sm text-navy-400">No vehicles yet.</p>
+          ) : (
+            Object.entries(providerCounts)
+              .sort((a, b) => b[1] - a[1])
+              .map(([provider, count]) => <Row key={provider} label={provider} value={count} />)
+          )}
         </div>
 
         <div className="lg:col-span-2 rounded-2xl bg-white border border-navy-900/5 card-shadow p-6">

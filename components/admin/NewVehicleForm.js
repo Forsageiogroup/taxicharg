@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, X, Loader2 } from "lucide-react";
+import TerminalProviderFields from "./TerminalProviderFields";
 
-const EMPTY = { vehicle: "", rego: "", terminalId: "", driverId: "" };
+const EMPTY = { vehicle: "", rego: "", terminalId: "", driverId: "", provider: "Clover", merchantRef: "" };
 
 export default function NewVehicleForm({ driverOptions }) {
   const router = useRouter();
@@ -106,6 +107,12 @@ export default function NewVehicleForm({ driverOptions }) {
                   ))}
                 </select>
               </div>
+
+              <TerminalProviderFields
+                provider={form.provider}
+                merchantRef={form.merchantRef}
+                onChange={({ provider, merchantRef }) => setForm({ ...form, provider, merchantRef })}
+              />
 
               {error && <p className="text-sm text-red-600">{error}</p>}
 

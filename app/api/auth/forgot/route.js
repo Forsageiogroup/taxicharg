@@ -19,7 +19,11 @@ export async function POST(request) {
     if (!driver) return reply;
     const site = (process.env.TC_SITE_URL || new URL(request.url).origin).replace(/\/$/, "");
     const { data, error } = await db().auth.admin.generateLink({ type: "recovery", email, options: { redirectTo: site + "/reset" } });
-    if (error || !data?.properties?.action_link) { console.error("[forgot] generateLink", error); return reply; }
+    if (error || !data?.properties?.hashed_token) { console.error("[forgot] generateLink", error); return reply; }
+    // Our own address, not Supabase's verify link: opening it does nothing
+    // until the person presses Save, so a mail scanner that opens links in
+    // the background (Yahoo, Outlook) cannot use it up first.
+    const url = site + "/reset?t=" + encodeURIComponent(data.properties.hashed_token) + "&k=recovery";
     await sendMail({
       to: email, subject: "Choose a new TaxiCharg password",
       heading: "Choose a new password",
@@ -28,7 +32,7 @@ export async function POST(request) {
         "Someone asked to reset the password for your TaxiCharg account. Press the button to choose a new one. The link works once and expires after an hour.",
         "If this was not you, ignore this email - your password has not changed.",
       ],
-      button: { label: "Choose a new password", url: data.properties.action_link },
+      button: { label: "Choose a new password", url },
     });
   } catch (err) {
     console.error("[forgot]", err);

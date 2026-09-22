@@ -4,23 +4,32 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import AuthCard from "@/components/site/AuthCard";
 
-/** Arrived at from the reset email; the token is in the address after #. */
+/**
+ * Arrived at from the login / reset email. The token is in the address
+ * (?t=...&k=invite|recovery) and is only spent when Save is pressed, so a
+ * mail scanner opening the link in the background cannot use it up.
+ * Older links carried the session in the address after #; still accepted.
+ */
 export default function ResetPage() {
   const router = useRouter();
   const [token, setToken] = useState("");
+  const [kind, setKind] = useState("");
   const [pw, setPw] = useState(""); const [pw2, setPw2] = useState("");
   const [err, setErr] = useState(""); const [loading, setLoading] = useState(false);
   useEffect(() => {
-    const h = new URLSearchParams((typeof window !== "undefined" ? window.location.hash : "").replace(/^#/, ""));
-    setToken(h.get("access_token") || "");
-    if (typeof window !== "undefined") window.history.replaceState(null, "", window.location.pathname);
+    if (typeof window === "undefined") return;
+    const q = new URLSearchParams(window.location.search);
+    const h = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    if (q.get("t")) { setToken(q.get("t")); setKind(q.get("k") || "recovery"); }
+    else { setToken(h.get("access_token") || ""); setKind("session"); }
+    window.history.replaceState(null, "", window.location.pathname);
   }, []);
   async function submit(e) {
     e.preventDefault(); setErr("");
     if (pw.length < 8) return setErr("Use at least 8 characters.");
     if (pw !== pw2) return setErr("The two passwords do not match.");
     setLoading(true);
-    const r = await fetch("/api/auth/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accessToken: token, password: pw }) });
+    const r = await fetch("/api/auth/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(kind === "session" ? { accessToken: token, password: pw } : { tokenHash: token, kind, password: pw }) });
     const j = await r.json().catch(() => ({}));
     setLoading(false);
     if (!r.ok) return setErr(j.error || "Could not save that.");

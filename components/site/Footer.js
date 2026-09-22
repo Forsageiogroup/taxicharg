@@ -73,8 +73,8 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
-          <p>&copy; {new Date().getFullYear()} TaxiCharg. All rights reserved.</p>
-          <p>Sydney, NSW, Australia</p>
+          <p>&copy; {new Date().getFullYear()} NSW Group of Technologies Pty Ltd, trading as TAXI CHARG. All rights reserved.</p>
+          <p>ABN 37 696 203 059 &middot; Sydney, NSW, Australia</p>
         </div>
       </div>
     </footer>

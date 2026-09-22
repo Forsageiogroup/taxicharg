@@ -1,8 +1,8 @@
 import LegalPage from "@/components/site/LegalPage";
 
 // Who we are, in one place. Fill these in once; the policy reads them.
-const ENTITY = "TaxiCharg";                       // e.g. "W Eats Pty Ltd, trading as TaxiCharg"
-const ABN = "";                                    // e.g. "12 345 678 901"
+const ENTITY = "NSW Group of Technologies Pty Ltd, trading as TAXI CHARG";
+const ABN = "37 696 203 059";
 const ADDRESS = "our Sydney office";               // the postal address for written complaints
 const EMAIL = "support@taxicharg.com.au";
 const SITE = "taxicharg.com.au";

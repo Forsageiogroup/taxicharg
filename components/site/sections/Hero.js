@@ -45,11 +45,11 @@ export default function Hero() {
             <div className="tc-diagonal absolute inset-y-0 right-0 lg:-right-[10vw] left-0 lg:left-8 tc-streaks opacity-40" />
             <div className="relative flex justify-center items-center h-full">
               <TerminalArt size={330} className="w-[260px] sm:w-[330px] h-auto" />
-              <div className="tc-float absolute top-8 right-4 sm:right-10 bg-white rounded-xl shadow-xl px-4 py-3 text-navy-900">
+              <div className="tc-float absolute top-8 right-4 sm:right-10 bg-white rounded-xl card-shadow px-4 py-3 text-navy-900">
                 <div className="text-[10px] uppercase tracking-wider text-navy-500">Approved</div>
                 <div className="text-xl font-extrabold tabular-nums">$56.58</div>
               </div>
-              <div className="tc-float-late absolute bottom-4 left-2 sm:left-6 bg-white rounded-xl shadow-xl px-4 py-3 text-navy-900 flex items-center gap-3">
+              <div className="tc-float-late absolute bottom-4 left-2 sm:left-6 bg-white rounded-xl card-shadow px-4 py-3 text-navy-900 flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full brand-gradient flex items-center justify-center text-white text-sm font-bold">$</span>
                 <div>
                   <div className="text-[10px] uppercase tracking-wider text-navy-500">Paid to you</div>

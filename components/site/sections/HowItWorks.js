@@ -17,7 +17,7 @@ export default function HowItWorks() {
         </p>
         <div className="mt-12 grid md:grid-cols-3 gap-6">
           {steps.map((s) => (
-            <div key={s.n} className="rounded-2xl bg-white text-navy-900 p-8 text-left shadow-xl">
+            <div key={s.n} className="rounded-2xl bg-white text-navy-900 p-8 text-left card-shadow">
               <span className="inline-flex w-10 h-10 rounded-full brand-gradient text-white font-extrabold items-center justify-center">{s.n}</span>
               <h3 className="mt-5 text-xl font-extrabold">{s.title}</h3>
               <p className="mt-2 text-navy-600 leading-relaxed">{s.body}</p>

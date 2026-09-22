@@ -12,7 +12,7 @@ export default function CtaBand() {
           Our payment specialists work with drivers every week to set up the right terminal and payout for the way they drive. Let&rsquo;s talk about yours.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <Link href="/signup" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold bg-navy-950 text-white hover:bg-navy-800 transition-colors">
+          <Link href="/signup" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold btn-glass-dark text-white hover:opacity-95 transition-opacity">
             Apply now <ArrowRight className="w-4 h-4" />
           </Link>
           <Link href="/support/contact" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold bg-white/15 text-white hover:bg-white/25 transition-colors">

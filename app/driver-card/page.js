@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import CardArt from "@/components/site/art/CardArt";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import SubpageHero from "@/components/site/SubpageHero";
@@ -26,13 +26,7 @@ export default function DriverCardPage() {
         <section className="py-16 sm:py-20 bg-white">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-14 items-center">
             <div className="flex justify-center">
-              <Image
-                src="/logo.png"
-                alt="TaxiCharg driver card"
-                width={440}
-                height={440}
-                className="w-72 sm:w-80 h-auto drop-shadow-xl rounded-3xl"
-              />
+              <CardArt className="w-80 sm:w-96 h-auto" />
             </div>
             <div className="grid sm:grid-cols-2 gap-6">
               {features.map(({ icon: Icon, title, text }) => (

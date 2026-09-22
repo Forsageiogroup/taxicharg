@@ -7,19 +7,22 @@ const STYLES = {
   pending: "bg-amber-50 text-amber-700",
   suspended: "bg-red-50 text-red-700",
   failed: "bg-red-50 text-red-700",
+  faulty: "bg-red-50 text-red-700",
+  spare: "bg-amber-50 text-amber-700",
+  returned: "bg-navy-950/[0.05] text-navy-500",
   voided: "bg-navy-950/[0.06] text-navy-600",
   disconnected: "bg-navy-950/[0.05] text-navy-500",
   default: "bg-navy-950/[0.05] text-navy-500",
 };
 
-export default function StatusPill({ status, title }) {
+export default function StatusPill({ status, title, label }) {
   const cls = STYLES[status] || STYLES.default;
   return (
     <span
       title={title}
       className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${cls}`}
     >
-      {status}
+      {label || status}
     </span>
   );
 }

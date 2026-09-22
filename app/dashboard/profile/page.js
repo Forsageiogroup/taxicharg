@@ -9,6 +9,7 @@ import { Wallet, ArrowRight } from "lucide-react";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
+const formatDate = (d) => new Date(d).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
 
 export default async function ProfilePage() {
   const cookieStore = await cookies();
@@ -53,6 +54,46 @@ export default async function ProfilePage() {
             <p className="font-semibold text-navy-900">{driver.email}</p>
           </div>
         </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 sm:p-8">
+        <h2 className="font-bold text-navy-900">Your terminals</h2>
+        <p className="mt-1 text-sm text-navy-500">
+          The EFTPOS terminals allocated to you by the office. Contact support if one is faulty or needs swapping.
+        </p>
+        {driver.terminals.length === 0 ? (
+          <p className="mt-4 text-sm text-navy-400">No terminal has been allocated to you yet.</p>
+        ) : (
+          <div className="mt-4 grid sm:grid-cols-2 gap-4">
+            {driver.terminals.map((t) => (
+              <div key={t.id} className="rounded-xl border border-navy-900/5 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-semibold text-navy-900">{t.label || `Terminal ${t.serial}`}</p>
+                  <StatusPill status={t.status} />
+                </div>
+                <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
+                  <dt className="text-navy-400">Serial</dt><dd className="font-mono text-navy-900">{t.serial}</dd>
+                  <dt className="text-navy-400">Terminal ID</dt><dd className="font-mono text-navy-900">{t.tid}</dd>
+                  <dt className="text-navy-400">Merchant ID</dt><dd className="font-mono text-navy-900">{t.mid}</dd>
+                  <dt className="text-navy-400">Cab</dt><dd className="text-navy-900">{t.plate ? `${t.plate}${t.vehicleClass ? ` · ${t.vehicleClass}` : ""}` : "—"}</dd>
+                  <dt className="text-navy-400">Held since</dt><dd className="text-navy-900">{t.since ? formatDate(t.since) : "—"}</dd>
+                </dl>
+              </div>
+            ))}
+          </div>
+        )}
+        {driver.terminalHistory.length > 0 && (
+          <details className="mt-4 text-sm">
+            <summary className="cursor-pointer font-semibold text-navy-700">Terminals you held before</summary>
+            <ul className="mt-2 space-y-1 text-navy-600">
+              {driver.terminalHistory.map((h) => (
+                <li key={h.id}>
+                  <span className="font-mono">{h.serial || h.tid}</span>{h.label ? ` (${h.label})` : ""} · {formatDate(h.from)} to {formatDate(h.to)}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </div>
 
       <div className="mt-6 rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 sm:p-8">

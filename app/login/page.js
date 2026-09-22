@@ -3,9 +3,8 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Clock, Info, Loader2, ShieldAlert } from "lucide-react";
+import { Clock, Loader2, ShieldAlert } from "lucide-react";
 import AuthCard from "@/components/site/AuthCard";
-import { DEMO_DRIVER_CREDENTIALS } from "@/lib/demoCredentials";
 
 function LoginForm() {
   const router = useRouter();
@@ -38,9 +37,6 @@ function LoginForm() {
     }
   }
 
-  function fillDemo() {
-    setForm({ email: DEMO_DRIVER_CREDENTIALS.email, password: DEMO_DRIVER_CREDENTIALS.password });
-  }
 
   return (
     <AuthCard
@@ -60,6 +56,10 @@ function LoginForm() {
           <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
           <span>You were signed out because this account was signed in on another device or terminal.</span>
         </div>
+      )}
+
+      {params.get("reason") === "password-set" && (
+        <div className="mb-4 rounded-lg bg-emerald-50 text-emerald-800 px-3.5 py-3 text-sm">Your new password is saved. Log in with it now.</div>
       )}
 
       {params.get("reason") === "idle-timeout" && (
@@ -109,14 +109,9 @@ function LoginForm() {
         </p>
       </form>
 
-      <button
-        onClick={fillDemo}
-        type="button"
-        className="mt-5 w-full flex items-center gap-2 text-xs text-navy-500 bg-navy-950/[0.03] rounded-lg px-3 py-2.5 hover:bg-navy-950/[0.06]"
-      >
-        <Info className="w-3.5 h-3.5 shrink-0" />
-        Demo mode: click to fill demo driver credentials
-      </button>
+      <p className="mt-5 text-center text-sm">
+        <Link href="/forgot" className="font-semibold text-orange-500 hover:text-orange-600">Forgot your password?</Link>
+      </p>
     </AuthCard>
   );
 }

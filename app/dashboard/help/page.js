@@ -11,8 +11,8 @@ const FAQS = [
     a: "Go to your Profile, open \"Manage payment connections\", and click \"Connect EFTPOS Terminal\". You'll be asked to authorise TaxiCharg — once approved you're brought straight back to your dashboard.",
   },
   {
-    q: "Why do I need to connect Bank Payouts?",
-    a: "That's how TaxiCharg sends your settled earnings to your own bank account. Without it, withdrawals run in demo mode only.",
+    q: "How do withdrawals get paid?",
+    a: "By bank transfer to the account we have on file for you, usually within 1-2 business days of your request. Contact support if your bank details change.",
   },
   {
     q: "Is there a fee to withdraw funds?",

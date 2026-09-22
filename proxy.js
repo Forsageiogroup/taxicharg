@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifySessionToken, DRIVER_COOKIE, ADMIN_COOKIE } from "@/lib/auth";
+import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
 
 export async function proxy(request) {
   const { pathname } = request.nextUrl;
@@ -15,14 +15,13 @@ export async function proxy(request) {
     }
   }
 
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    const token = request.cookies.get(ADMIN_COOKIE)?.value;
-    const session = await verifySessionToken(token);
-    if (!session || session.role !== "admin") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
-      return NextResponse.redirect(url);
-    }
+  // There is no back office here any more: the office runs Taxi Charge
+  // from its own panel. Old /admin links go to the driver log in.
+  if (pathname.startsWith("/admin")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

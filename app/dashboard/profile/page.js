@@ -39,8 +39,19 @@ export default async function ProfilePage() {
         </div>
 
         <div className="grid sm:grid-cols-2 gap-6 mt-6 pt-6 border-t border-navy-900/5">
-          <EditableField label="Plate number" value={driver.plate} fieldKey="plate" />
+          <div>
+            <p className="text-xs text-navy-400">Plate number</p>
+            <p className="font-semibold text-navy-900">{driver.plate || "—"}</p>
+            <p className="text-xs text-navy-400 mt-1">Set by the office when your terminal is allocated.</p>
+          </div>
           <EditableField label="ABN" value={driver.abn} fieldKey="abn" />
+        </div>
+        <div className="grid sm:grid-cols-2 gap-6 mt-6 pt-6 border-t border-navy-900/5">
+          <EditableField label="Phone" value={driver.phone} fieldKey="phone" />
+          <div>
+            <p className="text-xs text-navy-400">Email</p>
+            <p className="font-semibold text-navy-900">{driver.email}</p>
+          </div>
         </div>
       </div>
 

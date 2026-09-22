@@ -41,9 +41,10 @@ export default function SignupPage() {
           <PartyPopper className="w-5 h-5 text-orange-500 shrink-0" />
           <p>
             Thanks, {form.name.split(" ")[0] || "driver"}! Our team will verify your details and
-            set up your account. In the meantime you can explore the driver dashboard with our{" "}
+            set up your account. Your login details will arrive by email once it is ready, and
+            you can{" "}
             <Link href="/login" className="font-semibold text-orange-600">
-              demo login
+              log in here
             </Link>
             .
           </p>

@@ -21,9 +21,9 @@ export async function POST(request) {
     return NextResponse.json({ error: "Amount exceeds your available balance." }, { status: 400 });
   }
 
-  // Real payout path: only runs once the driver has connected Stripe AND
-  // the server has real Stripe keys configured. Otherwise we simulate a
-  // successful withdrawal so the flow can be demoed end-to-end.
+  // Stripe path: only once the driver has connected Stripe AND the server
+  // has real Stripe keys. Otherwise the withdrawal is a request to the
+  // office: it appears on the panel's payout queue and is paid from there.
   if (driver.connections.stripe.connected && isStripeConfigured()) {
     try {
       const payout = await createPayout({
@@ -37,13 +37,13 @@ export async function POST(request) {
     }
   }
 
-  await recordWithdrawal(driver.id, { amount, status: "processing" });
+  const req = await recordWithdrawal(driver.id, { amount, status: "processing" });
 
   return NextResponse.json({
     ok: true,
-    mode: "demo",
+    mode: "office",
     payout: {
-      id: `demo_payout_${Date.now()}`,
+      id: req ? req.id : null,
       amount,
       arrivalEstimate: "1-2 business days",
     },

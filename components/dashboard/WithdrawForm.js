@@ -74,8 +74,8 @@ export default function WithdrawForm({ availableBalance, accountBalance, stripeC
         {!stripeConnected && (
           <p className="mt-4 flex items-start gap-2 text-sm text-amber-700 bg-amber-50 rounded-lg px-4 py-3">
             <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
-            Bank payouts aren&apos;t connected yet, so withdrawals will run in demo mode. Connect
-            them from your Profile to send real payouts to your bank.
+            Withdrawals are paid by bank transfer to the account we have on file for you,
+            usually within 1&ndash;2 business days. Contact support if your bank details change.
           </p>
         )}
 
@@ -132,7 +132,7 @@ export default function WithdrawForm({ availableBalance, accountBalance, stripeC
               <p>
                 {currency(result.payout.amount)} is on its way
                 {result.payout.arrivalEstimate ? ` (${result.payout.arrivalEstimate})` : ""}.
-                {result.mode === "demo" && " This ran in demo mode — no real funds were moved."}
+                {result.mode === "office" && " You will see it under Settlements once it is paid."}
               </p>
             </div>
           </div>

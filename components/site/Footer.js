@@ -74,7 +74,7 @@ export default function Footer() {
 
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
           <p>&copy; {new Date().getFullYear()} TaxiCharg. All rights reserved.</p>
-          <p>ABN XX XXX XXX XXX &middot; NSW, Australia</p>
+          <p>Sydney, NSW, Australia</p>
         </div>
       </div>
     </footer>

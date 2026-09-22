@@ -17,17 +17,17 @@ export default function Navbar() {
   const [supportOpen, setSupportOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-navy-900/5">
+    <header className="sticky top-0 z-50 bg-navy-950/95 backdrop-blur border-b border-white/10 text-white">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="shrink-0">
-          <Logo className="text-lg sm:text-xl" />
+          <Logo dark className="text-lg sm:text-xl" />
         </Link>
 
-        <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-navy-700">
-          <Link href="/eftpos" className="hover:text-orange-500 transition-colors">
+        <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-white/85">
+          <Link href="/eftpos" className="hover:text-orange-400 transition-colors">
             Taxi EFTPOS machine
           </Link>
-          <Link href="/driver-card" className="hover:text-orange-500 transition-colors">
+          <Link href="/driver-card" className="hover:text-orange-400 transition-colors">
             TaxiCharg Driver Card
           </Link>
           <div
@@ -35,7 +35,7 @@ export default function Navbar() {
             onMouseEnter={() => setSupportOpen(true)}
             onMouseLeave={() => setSupportOpen(false)}
           >
-            <button className="flex items-center gap-1 hover:text-orange-500 transition-colors">
+            <button className="flex items-center gap-1 hover:text-orange-400 transition-colors">
               Services &amp; support <ChevronDown className="w-4 h-4" />
             </button>
             {supportOpen && (
@@ -59,7 +59,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3">
           <Link
             href="/login"
-            className="px-4 py-2 text-sm font-semibold text-navy-800 hover:text-orange-500 transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-white/90 hover:text-orange-400 transition-colors"
           >
             Login
           </Link>
@@ -72,7 +72,7 @@ export default function Navbar() {
         </div>
 
         <button
-          className="lg:hidden p-2 text-navy-800"
+          className="lg:hidden p-2 text-white"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
         >
@@ -81,22 +81,22 @@ export default function Navbar() {
       </nav>
 
       {open && (
-        <div className="lg:hidden border-t border-navy-900/5 bg-white px-4 pb-4 pt-2 space-y-1">
-          <Link href="/eftpos" className="block py-2 text-navy-700 font-medium">
+        <div className="lg:hidden border-t border-white/10 bg-navy-950 px-4 pb-4 pt-2 space-y-1">
+          <Link href="/eftpos" className="block py-2 text-white/90 font-medium">
             Taxi EFTPOS machine
           </Link>
-          <Link href="/driver-card" className="block py-2 text-navy-700 font-medium">
+          <Link href="/driver-card" className="block py-2 text-white/90 font-medium">
             TaxiCharg Driver Card
           </Link>
           {supportLinks.map((l) => (
-            <Link key={l.href} href={l.href} className="block py-2 pl-3 text-navy-600">
+            <Link key={l.href} href={l.href} className="block py-2 pl-3 text-white/70">
               {l.label}
             </Link>
           ))}
           <div className="flex gap-3 pt-3">
             <Link
               href="/login"
-              className="flex-1 text-center px-4 py-2 rounded-full border border-navy-900/10 font-semibold text-navy-800"
+              className="flex-1 text-center px-4 py-2 rounded-full border border-white/20 font-semibold text-white"
             >
               Login
             </Link>

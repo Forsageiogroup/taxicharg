@@ -62,3 +62,36 @@ body {
 .card-shadow {
   box-shadow: 0 10px 30px -12px rgba(10, 14, 19, 0.25);
 }
+
+/* ── home page art ─────────────────────────────────────────────────────── */
+/* light streaks across navy, like headlights on a wet road */
+.tc-streaks {
+  background-color: var(--navy-950);
+  background-image:
+    linear-gradient(115deg, transparent 0 38%, rgba(249, 125, 35, 0.55) 40%, transparent 43%),
+    linear-gradient(115deg, transparent 0 55%, rgba(250, 166, 56, 0.35) 56%, transparent 60%),
+    linear-gradient(115deg, transparent 0 70%, rgba(235, 88, 53, 0.45) 72%, transparent 76%),
+    linear-gradient(115deg, transparent 0 84%, rgba(255, 255, 255, 0.10) 85%, transparent 88%),
+    linear-gradient(160deg, var(--navy-800) 0%, var(--navy-950) 100%);
+}
+/* the hero picture's diagonal cut */
+.tc-diagonal { clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%); }
+@media (max-width: 1023px) { .tc-diagonal { clip-path: polygon(0 12%, 100% 0, 100% 100%, 0 100%); border-radius: 1.5rem; } }
+
+@keyframes tc-tap { 0%, 100% { transform: translate(0, 0) } 50% { transform: translate(26px, -14px) } }
+@keyframes tc-ring { 0%, 100% { opacity: .35 } 50% { opacity: 1 } }
+@keyframes tc-float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+@keyframes tc-coin { 0%, 100% { transform: translateY(0) rotate(0) } 50% { transform: translateY(-10px) rotate(8deg) } }
+.tc-tap { animation: tc-tap 3.2s ease-in-out infinite; transform-origin: center; }
+.tc-ring { animation: tc-ring 1.6s ease-in-out infinite; }
+.tc-float { animation: tc-float 4s ease-in-out infinite; }
+.tc-float-late { animation: tc-float 4s ease-in-out 1.3s infinite; }
+.tc-coin { animation: tc-coin 3.6s ease-in-out infinite; }
+.tc-coin-0 { top: -6px; left: 30px; animation-delay: 0s; }
+.tc-coin-1 { top: 40px; right: -10px; animation-delay: .6s; }
+.tc-coin-2 { bottom: 20px; right: 10px; animation-delay: 1.2s; }
+.tc-coin-3 { bottom: -8px; left: 60px; animation-delay: 1.8s; }
+.tc-coin-4 { top: 120px; left: -14px; animation-delay: 2.4s; }
+@media (prefers-reduced-motion: reduce) {
+  .tc-tap, .tc-ring, .tc-float, .tc-float-late, .tc-coin { animation: none; }
+}

@@ -1,12 +1,11 @@
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import Hero from "@/components/site/sections/Hero";
-import ValueProps from "@/components/site/sections/ValueProps";
-import DriversFirst from "@/components/site/sections/DriversFirst";
-import SupportSection from "@/components/site/sections/SupportSection";
-import DriverCardPromo from "@/components/site/sections/DriverCardPromo";
-import WalletBadges from "@/components/site/sections/WalletBadges";
-import ContactCTA from "@/components/site/sections/ContactCTA";
+import WhyChoose from "@/components/site/sections/WhyChoose";
+import Features from "@/components/site/sections/Features";
+import Partnership from "@/components/site/sections/Partnership";
+import HowItWorks from "@/components/site/sections/HowItWorks";
+import CtaBand from "@/components/site/sections/CtaBand";
 
 export default function Home() {
   return (
@@ -14,12 +13,11 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
-        <ValueProps />
-        <DriversFirst />
-        <SupportSection />
-        <DriverCardPromo />
-        <WalletBadges />
-        <ContactCTA />
+        <WhyChoose />
+        <Features />
+        <Partnership />
+        <HowItWorks />
+        <CtaBand />
       </main>
       <Footer />
     </>

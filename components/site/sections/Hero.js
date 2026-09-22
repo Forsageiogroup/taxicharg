@@ -1,65 +1,65 @@
 import Link from "next/link";
-import Image from "next/image";
-import { ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, ShieldCheck, Zap, Banknote } from "lucide-react";
+import TerminalArt from "../art/TerminalArt";
 
 export default function Hero() {
   return (
-    <section className="navy-gradient relative overflow-hidden text-white">
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-[32rem] h-[32rem] rounded-full brand-gradient blur-3xl" />
+    <>
+      {/* the ribbon */}
+      <div className="tc-streaks text-white">
+        <p className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3.5 text-center text-sm sm:text-base font-semibold tracking-wide">
+          The taxi EFTPOS terminal that pays drivers faster
+        </p>
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 lg:py-28 grid lg:grid-cols-2 gap-14 items-center">
-        <div>
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-orange-300 text-xs font-semibold tracking-wide uppercase">
-            <Zap className="w-3.5 h-3.5" /> Built for NSW taxi drivers
-          </span>
-
-          <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-            Letting you focus
-            <span className="block brand-gradient-text">on the road.</span>
-          </h1>
-
-          <p className="mt-6 text-lg text-white/70 max-w-xl">
-            TaxiCharg is the driver payment solution that gets fares into
-            your pocket faster &mdash; low-fee EFTPOS, instant settlement,
-            and a card built for the way you actually drive.
-          </p>
-
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Link
-              href="/signup"
-              className="px-7 py-3.5 rounded-full font-semibold brand-gradient hover:opacity-90 transition-opacity"
-            >
-              Get Started Now
-            </Link>
-            <Link
-              href="/support/contact"
-              className="px-7 py-3.5 rounded-full font-semibold border border-white/20 hover:bg-white/10 transition-colors"
-            >
-              Talk to sales
-            </Link>
+      <section className="relative overflow-hidden bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 items-center">
+          <div className="py-16 lg:py-24 pr-0 lg:pr-10">
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.6rem] font-extrabold leading-[1.08] tracking-tight text-navy-900" style={{ textWrap: "balance" }}>
+              Take the fare. <span className="text-navy-600 font-bold">Keep more of it.</span>{" "}
+              <span className="brand-gradient-text">Get paid today.</span>
+            </h1>
+            <p className="mt-6 text-lg text-navy-600 max-w-xl leading-relaxed">
+              TaxiCharg gives Sydney taxi drivers a smart EFTPOS terminal, clear
+              statements and fast access to every card fare &mdash; on your card,
+              in your bank, or in cash from our office.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <Link href="/signup" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-white brand-gradient hover:opacity-90 transition-opacity">
+                Get your EFTPOS terminal <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a href="#how" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-navy-800 border border-navy-900/15 hover:border-orange-400 hover:text-orange-600 transition-colors">
+                See how it works
+              </a>
+            </div>
+            <ul className="mt-9 grid sm:grid-cols-3 gap-4 text-sm text-navy-600">
+              <li className="flex items-center gap-2"><Zap className="w-4 h-4 text-orange-500" /> Same-day access to fares</li>
+              <li className="flex items-center gap-2"><Banknote className="w-4 h-4 text-orange-500" /> No lock-in contract</li>
+              <li className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-orange-500" /> Secure, PCI-compliant</li>
+            </ul>
           </div>
 
-          <div className="mt-10 flex items-center gap-2 text-sm text-white/50">
-            <ShieldCheck className="w-4 h-4 text-orange-400" />
-            PCI-compliant payments &middot; No lock-in contracts
-          </div>
-        </div>
-
-        <div className="relative flex justify-center lg:justify-end">
-          <div className="relative w-72 sm:w-96 rotate-3 hover:rotate-0 transition-transform duration-500">
-            <Image
-              src="/logo.png"
-              alt="TaxiCharg driver card"
-              width={500}
-              height={500}
-              priority
-              className="w-full h-auto drop-shadow-2xl rounded-3xl"
-            />
+          {/* the picture: a navy panel cut on the diagonal, the terminal in front */}
+          <div className="relative lg:min-h-[560px] py-10 lg:py-0">
+            <div className="tc-diagonal absolute inset-y-0 right-0 lg:-right-[10vw] left-0 lg:left-8 navy-gradient" />
+            <div className="tc-diagonal absolute inset-y-0 right-0 lg:-right-[10vw] left-0 lg:left-8 tc-streaks opacity-40" />
+            <div className="relative flex justify-center items-center h-full">
+              <TerminalArt size={330} className="w-[260px] sm:w-[330px] h-auto" />
+              <div className="tc-float absolute top-8 right-4 sm:right-10 bg-white rounded-xl shadow-xl px-4 py-3 text-navy-900">
+                <div className="text-[10px] uppercase tracking-wider text-navy-500">Approved</div>
+                <div className="text-xl font-extrabold tabular-nums">$56.58</div>
+              </div>
+              <div className="tc-float-late absolute bottom-4 left-2 sm:left-6 bg-white rounded-xl shadow-xl px-4 py-3 text-navy-900 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full brand-gradient flex items-center justify-center text-white text-sm font-bold">$</span>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-navy-500">Paid to you</div>
+                  <div className="text-sm font-bold">Today, 6:02 pm</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

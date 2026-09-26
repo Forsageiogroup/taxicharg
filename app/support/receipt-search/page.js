@@ -34,7 +34,7 @@ export default function ReceiptSearchPage() {
                   value={query.reference}
                   onChange={(e) => setQuery({ ...query, reference: e.target.value })}
                   placeholder="e.g. TC-284910"
-                  className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                 />
               </div>
               <div>
@@ -43,7 +43,7 @@ export default function ReceiptSearchPage() {
                   type="date"
                   value={query.date}
                   onChange={(e) => setQuery({ ...query, date: e.target.value })}
-                  className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                 />
               </div>
               <button
@@ -57,7 +57,7 @@ export default function ReceiptSearchPage() {
             {searched && (
               <p className="mt-6 text-center text-sm text-navy-500">
                 No receipt found for those details. Double-check your trip reference, or{" "}
-                <a href="/support/contact" className="font-semibold text-orange-600">
+                <a href="/support/contact" className="font-semibold text-green-600">
                   contact support
                 </a>
                 .

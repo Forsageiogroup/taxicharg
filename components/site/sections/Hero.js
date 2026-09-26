@@ -28,14 +28,14 @@ export default function Hero() {
               <Link href="/signup" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-white brand-gradient hover:opacity-90 transition-opacity">
                 Get your EFTPOS terminal <ArrowRight className="w-4 h-4" />
               </Link>
-              <a href="#how" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-navy-800 border border-navy-900/15 hover:border-orange-400 hover:text-orange-600 transition-colors">
+              <a href="#how" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-navy-800 border border-navy-900/15 hover:border-green-400 hover:text-green-600 transition-colors">
                 See how it works
               </a>
             </div>
             <ul className="mt-9 grid sm:grid-cols-3 gap-4 text-sm text-navy-600">
-              <li className="flex items-center gap-2"><Zap className="w-4 h-4 text-orange-500" /> Same-day access to fares</li>
-              <li className="flex items-center gap-2"><Banknote className="w-4 h-4 text-orange-500" /> No lock-in contract</li>
-              <li className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-orange-500" /> Secure, PCI-compliant</li>
+              <li className="flex items-center gap-2"><Zap className="w-4 h-4 text-green-500" /> Same-day access to fares</li>
+              <li className="flex items-center gap-2"><Banknote className="w-4 h-4 text-green-500" /> No lock-in contract</li>
+              <li className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-green-500" /> Secure, PCI-compliant</li>
             </ul>
           </div>
 

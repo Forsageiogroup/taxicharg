@@ -15,7 +15,7 @@ export default function DashboardMock({ className = "" }) {
     <div className={`rounded-2xl bg-white border border-navy-900/10 shadow-[0_30px_60px_-30px_rgba(10,14,19,.45)] overflow-hidden ${className}`}>
       <div className="flex">
         <aside className="hidden sm:block w-36 bg-navy-950 text-white/70 p-4 text-[11px] space-y-3">
-          <div className="flex items-center gap-1.5 font-display font-black text-white text-sm tracking-tight"><Mark size={18} />TAXI<span className="text-orange-500">CHARG</span></div>
+          <div className="flex items-center gap-1.5 font-display font-black text-white text-sm tracking-tight"><Mark size={18} />TAXI<span className="text-green-500">CHARG</span></div>
           <div className="pt-2 space-y-2">
             <div className="text-white bg-white/10 rounded-md px-2 py-1">Overview</div>
             <div className="px-2">Payments</div>

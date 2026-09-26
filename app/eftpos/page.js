@@ -46,7 +46,7 @@ export default function EftposPage() {
                 "24/7 terminal support",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 rounded-xl bg-white border border-navy-900/5 px-5 py-4 text-sm text-navy-700">
-                  <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
                   {item}
                 </li>
               ))}

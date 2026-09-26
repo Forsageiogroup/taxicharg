@@ -37,13 +37,13 @@ export default function SignupPage() {
   if (done) {
     return (
       <AuthCard title="Application received" subtitle="We'll be in touch shortly.">
-        <div className="rounded-xl bg-orange-50 p-5 text-navy-700 text-sm flex gap-3">
-          <PartyPopper className="w-5 h-5 text-orange-500 shrink-0" />
+        <div className="rounded-xl bg-green-50 p-5 text-navy-700 text-sm flex gap-3">
+          <PartyPopper className="w-5 h-5 text-green-500 shrink-0" />
           <p>
             Thanks, {form.name.split(" ")[0] || "driver"}! Our team will verify your details and
             set up your account. Your login details will arrive by email once it is ready, and
             you can{" "}
-            <Link href="/login" className="font-semibold text-orange-600">
+            <Link href="/login" className="font-semibold text-green-600">
               log in here
             </Link>
             .
@@ -60,7 +60,7 @@ export default function SignupPage() {
       footer={
         <>
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-orange-500 hover:text-orange-600">
+          <Link href="/login" className="font-semibold text-green-500 hover:text-green-600">
             Log in
           </Link>
         </>
@@ -73,7 +73,7 @@ export default function SignupPage() {
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
         <div>
@@ -83,7 +83,7 @@ export default function SignupPage() {
             type="email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
         <div>
@@ -93,7 +93,7 @@ export default function SignupPage() {
             type="tel"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
         <div>
@@ -103,7 +103,7 @@ export default function SignupPage() {
           <input
             value={form.plate}
             onChange={(e) => setForm({ ...form, plate: e.target.value })}
-            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
 

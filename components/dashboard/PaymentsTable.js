@@ -56,13 +56,13 @@ export default function PaymentsTable({ payments }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by method..."
-              className="w-full pl-9 pr-3 py-2 rounded-lg border border-navy-900/10 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full pl-9 pr-3 py-2 rounded-lg border border-navy-900/10 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="rounded-lg border border-navy-900/10 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="rounded-lg border border-navy-900/10 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
           >
             <option value="all">All statuses</option>
             <option value="settled">Settled</option>

@@ -36,7 +36,7 @@ export default function EditableField({ label, value, fieldKey }) {
             autoFocus
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            className="text-sm font-semibold text-navy-900 border border-navy-900/10 rounded-md px-2 py-1 w-32 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="text-sm font-semibold text-navy-900 border border-navy-900/10 rounded-md px-2 py-1 w-32 focus:outline-none focus:ring-2 focus:ring-green-400"
           />
           <button onClick={save} disabled={saving} className="text-green-600 hover:text-green-700">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
@@ -54,7 +54,7 @@ export default function EditableField({ label, value, fieldKey }) {
       ) : (
         <div className="flex items-center gap-2 mt-0.5">
           <p className="font-semibold text-navy-900">{value}</p>
-          <button onClick={() => setEditing(true)} className="text-navy-300 hover:text-orange-500" aria-label={`Edit ${label}`}>
+          <button onClick={() => setEditing(true)} className="text-navy-300 hover:text-green-500" aria-label={`Edit ${label}`}>
             <Pencil className="w-3.5 h-3.5" />
           </button>
         </div>

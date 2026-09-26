@@ -32,11 +32,11 @@ export default function Features() {
         {/* Instant pay, with the dashboard */}
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
-            <div className="absolute -inset-6 rounded-[2rem] bg-orange-50 -rotate-2" />
+            <div className="absolute -inset-6 rounded-[2rem] bg-green-50 -rotate-2" />
             <DashboardMock className="relative rotate-[-2deg] hover:rotate-0 transition-transform duration-500" />
           </div>
           <div>
-            <span className="inline-flex items-center gap-2 text-sm font-semibold text-orange-500 uppercase tracking-wide">
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-green-500 uppercase tracking-wide">
               <Clock className="w-4 h-4" /> Instant pay
             </span>
             <h3 className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-navy-900" style={{ textWrap: "balance" }}>
@@ -48,7 +48,7 @@ export default function Features() {
               sent to your bank, or collect cash from our office &mdash; your
               choice, every time.
             </p>
-            <Link href="/driver-card" className="inline-flex items-center gap-1.5 mt-6 font-semibold text-orange-500 hover:text-orange-600">
+            <Link href="/driver-card" className="inline-flex items-center gap-1.5 mt-6 font-semibold text-green-500 hover:text-green-600">
               About the Driver Card &rarr;
             </Link>
           </div>

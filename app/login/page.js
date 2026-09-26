@@ -45,7 +45,7 @@ function LoginForm() {
       footer={
         <>
           New to TaxiCharg?{" "}
-          <Link href="/signup" className="font-semibold text-orange-500 hover:text-orange-600">
+          <Link href="/signup" className="font-semibold text-green-500 hover:text-green-600">
             Apply to join
           </Link>
         </>
@@ -77,7 +77,7 @@ function LoginForm() {
             type="email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
             placeholder="you@example.com"
           />
         </div>
@@ -88,7 +88,7 @@ function LoginForm() {
             type="password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
             placeholder="••••••••"
           />
         </div>
@@ -110,7 +110,7 @@ function LoginForm() {
       </form>
 
       <p className="mt-5 text-center text-sm">
-        <Link href="/forgot" className="font-semibold text-orange-500 hover:text-orange-600">Forgot your password?</Link>
+        <Link href="/forgot" className="font-semibold text-green-500 hover:text-green-600">Forgot your password?</Link>
       </p>
     </AuthCard>
   );

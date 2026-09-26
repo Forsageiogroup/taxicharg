@@ -77,7 +77,7 @@ export default function IdleTimeout() {
   return (
     <div className="fixed bottom-4 right-4 z-50 w-[calc(100%-2rem)] max-w-sm rounded-xl bg-white shadow-lg border border-navy-900/10 px-4 py-3.5">
       <div className="flex items-start gap-2.5">
-        <Clock className="w-4.5 h-4.5 text-orange-500 mt-0.5 shrink-0" />
+        <Clock className="w-4.5 h-4.5 text-green-500 mt-0.5 shrink-0" />
         <div>
           <p className="text-sm font-semibold text-navy-900">Still there?</p>
           <p className="mt-1 text-sm text-navy-500">

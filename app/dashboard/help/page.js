@@ -35,7 +35,7 @@ export default function HelpPage() {
             <details key={item.q} className="group p-6">
               <summary className="flex items-center justify-between cursor-pointer font-semibold text-navy-900 list-none">
                 {item.q}
-                <span className="text-orange-500 group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+                <span className="text-green-500 group-open:rotate-45 transition-transform text-xl leading-none">+</span>
               </summary>
               <p className="mt-3 text-sm text-navy-600 leading-relaxed">{item.a}</p>
             </details>
@@ -48,13 +48,13 @@ export default function HelpPage() {
             Our support team knows the taxi industry and is here every day.
           </p>
           <div className="mt-5 space-y-4 text-sm">
-            <a href="tel:1300000000" className="flex items-center gap-3 hover:text-orange-400">
+            <a href="tel:1300000000" className="flex items-center gap-3 hover:text-green-400">
               <Phone className="w-4 h-4" /> 1300 000 000
             </a>
-            <a href="mailto:support@taxicharg.com.au" className="flex items-center gap-3 hover:text-orange-400">
+            <a href="mailto:support@taxicharg.com.au" className="flex items-center gap-3 hover:text-green-400">
               <Mail className="w-4 h-4" /> support@taxicharg.com.au
             </a>
-            <a href="/support/contact" className="flex items-center gap-3 hover:text-orange-400">
+            <a href="/support/contact" className="flex items-center gap-3 hover:text-green-400">
               <MessageCircle className="w-4 h-4" /> Send us a message
             </a>
           </div>

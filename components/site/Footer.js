@@ -47,7 +47,7 @@ export default function Footer() {
                 <a
                   key={i}
                   href="#"
-                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-orange-500 flex items-center justify-center transition-colors"
+                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-green-500 flex items-center justify-center transition-colors"
                   aria-label="Social link"
                 >
                   <Icon className="w-4 h-4" />
@@ -62,7 +62,7 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="text-sm text-white/60 hover:text-orange-400">
+                    <Link href={l.href} className="text-sm text-white/60 hover:text-green-400">
                       {l.label}
                     </Link>
                   </li>

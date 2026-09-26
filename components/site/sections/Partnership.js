@@ -9,7 +9,7 @@ export default function Partnership() {
           <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-full brand-gradient flex items-center justify-center">
             <Gift className="w-28 h-28 text-white" strokeWidth={1.5} />
             {["$", "$", "$", "$", "$"].map((c, i) => (
-              <span key={i} className={`tc-coin absolute w-12 h-12 rounded-full bg-white text-orange-600 font-extrabold text-xl flex items-center justify-center shadow-lg tc-coin-${i}`}>{c}</span>
+              <span key={i} className={`tc-coin absolute w-12 h-12 rounded-full bg-white text-green-600 font-extrabold text-xl flex items-center justify-center shadow-lg tc-coin-${i}`}>{c}</span>
             ))}
           </div>
         </div>
@@ -22,7 +22,7 @@ export default function Partnership() {
             paid straight to your TaxiCharg balance once their terminal is
             taking fares. Terms and conditions apply.
           </p>
-          <Link href="/support/referral" className="inline-flex items-center gap-1.5 mt-6 font-semibold text-orange-500 hover:text-orange-600">
+          <Link href="/support/referral" className="inline-flex items-center gap-1.5 mt-6 font-semibold text-green-500 hover:text-green-600">
             How referrals work &rarr;
           </Link>
         </div>

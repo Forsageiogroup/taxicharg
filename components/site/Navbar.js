@@ -24,10 +24,10 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-white/85">
-          <Link href="/eftpos" className="hover:text-orange-400 transition-colors">
+          <Link href="/eftpos" className="hover:text-green-400 transition-colors">
             Taxi EFTPOS machine
           </Link>
-          <Link href="/driver-card" className="hover:text-orange-400 transition-colors">
+          <Link href="/driver-card" className="hover:text-green-400 transition-colors">
             TaxiCharg Driver Card
           </Link>
           <div
@@ -35,7 +35,7 @@ export default function Navbar() {
             onMouseEnter={() => setSupportOpen(true)}
             onMouseLeave={() => setSupportOpen(false)}
           >
-            <button className="flex items-center gap-1 hover:text-orange-400 transition-colors">
+            <button className="flex items-center gap-1 hover:text-green-400 transition-colors">
               Services &amp; support <ChevronDown className="w-4 h-4" />
             </button>
             {supportOpen && (
@@ -45,7 +45,7 @@ export default function Navbar() {
                     <Link
                       key={l.href}
                       href={l.href}
-                      className="block px-4 py-2 text-navy-700 hover:bg-orange-50 hover:text-orange-600"
+                      className="block px-4 py-2 text-navy-700 hover:bg-green-50 hover:text-green-600"
                     >
                       {l.label}
                     </Link>
@@ -59,7 +59,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3">
           <Link
             href="/login"
-            className="px-4 py-2 text-sm font-semibold text-white/90 hover:text-orange-400 transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-white/90 hover:text-green-400 transition-colors"
           >
             Login
           </Link>

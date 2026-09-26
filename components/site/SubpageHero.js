@@ -3,7 +3,7 @@ export default function SubpageHero({ eyebrow, title, subtitle }) {
     <section className="navy-gradient text-white">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
         {eyebrow && (
-          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-orange-300 mb-4">
+          <span className="inline-block text-xs font-semibold uppercase tracking-wide text-green-300 mb-4">
             {eyebrow}
           </span>
         )}

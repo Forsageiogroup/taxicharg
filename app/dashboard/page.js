@@ -52,7 +52,7 @@ export default async function OverviewPage({ searchParams }) {
         <div className="lg:col-span-2 rounded-2xl bg-white border border-navy-900/5 card-shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-navy-900/5 flex items-center justify-between">
             <h2 className="font-bold text-navy-900">Recent activity</h2>
-            <Link href="/dashboard/payments/transactions" className="text-sm font-semibold text-orange-500 hover:text-orange-600">
+            <Link href="/dashboard/payments/transactions" className="text-sm font-semibold text-green-500 hover:text-green-600">
               View all
             </Link>
           </div>

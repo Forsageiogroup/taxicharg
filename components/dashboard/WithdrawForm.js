@@ -56,7 +56,7 @@ export default function WithdrawForm({ availableBalance, accountBalance, stripeC
               onMouseEnter={() => setShowTip(true)}
               onMouseLeave={() => setShowTip(false)}
               onClick={() => setShowTip((v) => !v)}
-              className="w-8 h-8 rounded-full border border-navy-900/10 flex items-center justify-center text-navy-400 hover:text-orange-500"
+              className="w-8 h-8 rounded-full border border-navy-900/10 flex items-center justify-center text-navy-400 hover:text-green-500"
               aria-label="Withdrawal info"
             >
               <HelpCircle className="w-4 h-4" />
@@ -94,7 +94,7 @@ export default function WithdrawForm({ availableBalance, accountBalance, stripeC
                   max={availableBalance}
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-navy-900/10 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-navy-900/10 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                   placeholder="0.00"
                 />
               </div>
@@ -106,7 +106,7 @@ export default function WithdrawForm({ availableBalance, accountBalance, stripeC
             <button
               type="button"
               onClick={() => setAmount(String(availableBalance.toFixed(2)))}
-              className="text-xs font-semibold text-orange-500 hover:text-orange-600"
+              className="text-xs font-semibold text-green-500 hover:text-green-600"
             >
               Withdraw full balance
             </button>

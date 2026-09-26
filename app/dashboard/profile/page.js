@@ -118,7 +118,7 @@ export default async function ProfilePage() {
 
         <Link
           href="/dashboard/connect"
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-orange-500 hover:text-orange-600"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600"
         >
           Manage payment connections <ArrowRight className="w-3.5 h-3.5" />
         </Link>

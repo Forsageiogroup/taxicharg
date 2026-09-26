@@ -31,8 +31,8 @@ export default function DriverCardPage() {
             <div className="grid sm:grid-cols-2 gap-6">
               {features.map(({ icon: Icon, title, text }) => (
                 <div key={title}>
-                  <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center mb-3">
-                    <Icon className="w-5 h-5 text-orange-500" />
+                  <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center mb-3">
+                    <Icon className="w-5 h-5 text-green-500" />
                   </div>
                   <h3 className="font-bold text-navy-900 text-sm">{title}</h3>
                   <p className="mt-1 text-sm text-navy-600">{text}</p>

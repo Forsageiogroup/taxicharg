@@ -17,7 +17,7 @@ export default function LegalPage({ title, updated, draft = true, children }) {
                 obligations before going live.
               </div>
             )}
-            <div className="legal space-y-5 text-navy-700 leading-relaxed [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:text-navy-900 [&_h2]:mt-10 [&_h2]:mb-2 [&_h3]:font-bold [&_h3]:text-navy-900 [&_h3]:mt-6 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1.5 [&_a]:text-orange-600 [&_a]:font-semibold">{children}</div>
+            <div className="legal space-y-5 text-navy-700 leading-relaxed [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:text-navy-900 [&_h2]:mt-10 [&_h2]:mb-2 [&_h3]:font-bold [&_h3]:text-navy-900 [&_h3]:mt-6 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1.5 [&_a]:text-green-600 [&_a]:font-semibold">{children}</div>
           </div>
         </section>
       </main>

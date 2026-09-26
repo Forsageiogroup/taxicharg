@@ -40,9 +40,9 @@ export default function ResetPage() {
       {!token ? <p className="text-sm text-red-600">This link has expired or was already used. Ask for a new one from the log in page.</p> : (
         <form onSubmit={submit} className="space-y-4">
           <input required type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="New password" autoComplete="new-password"
-            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
           <input required type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder="Type it again" autoComplete="new-password"
-            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+            className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
           {err && <p className="text-sm text-red-600">{err}</p>}
           <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
             {loading && <Loader2 className="w-4 h-4 animate-spin" />} Save and log in

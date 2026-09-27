@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { FacebookIcon, InstagramIcon, LinkedinIcon, XIcon } from "./SocialIcons";
 import Logo from "./Logo";
-import { Lock } from "lucide-react";
 
 const columns = [
   {
@@ -74,12 +73,7 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* what is true about how this site is protected - no more, no less */}
-        <p className="mt-10 flex items-start gap-2.5 text-xs text-white/60 max-w-2xl">
-          <Lock className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-          <span>Your connection to this site is encrypted (TLS). Card numbers are never seen or stored here &mdash; fares are taken on PCI DSS certified terminals, and payouts run through Stripe. Log in is protected by a one-time code and one device at a time.</span>
-        </p>
-        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
+        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
           <p>&copy; {new Date().getFullYear()} NSW Group of Technologies Pty Ltd, trading as TAXI CHARG. All rights reserved.</p>
           <p>ABN 37 696 203 059 &middot; Sydney, NSW, Australia</p>
         </div>

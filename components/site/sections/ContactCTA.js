@@ -3,10 +3,14 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
 import Reveal from "../motion/Reveal";
+import Turnstile, { Honeypot } from "../Turnstile";
 
 export default function ContactCTA() {
   const [status, setStatus] = useState("idle");
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [token, setToken] = useState("");
+  const [company, setCompany] = useState("");
+  const [errorText, setErrorText] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -15,9 +19,9 @@ export default function ContactCTA() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, turnstileToken: token, company }),
       });
-      if (!res.ok) throw new Error("Request failed");
+      if (!res.ok) { const j = await res.json().catch(() => ({})); setErrorText(j.error || ""); throw new Error("Request failed"); }
       setStatus("sent");
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch {
@@ -38,7 +42,7 @@ export default function ContactCTA() {
           </p>
         </Reveal>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 sm:p-8 card-shadow space-y-4">
+        <form onSubmit={handleSubmit} className="relative bg-white rounded-2xl p-6 sm:p-8 card-shadow space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <input
               required
@@ -71,6 +75,8 @@ export default function ContactCTA() {
             onChange={(e) => setForm({ ...form, message: e.target.value })}
             className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-navy-900 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
           />
+          <Honeypot value={company} onChange={setCompany} />
+          <Turnstile onToken={setToken} />
           <button
             type="submit"
             disabled={status === "sending"}
@@ -86,7 +92,7 @@ export default function ContactCTA() {
           )}
           {status === "error" && (
             <p className="text-sm text-red-600 text-center">
-              Something went wrong &mdash; please try again.
+              {errorText || "Something went wrong \u2014 please try again."}
             </p>
           )}
         </form>

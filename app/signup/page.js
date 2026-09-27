@@ -4,12 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { Loader2, PartyPopper } from "lucide-react";
 import AuthCard from "@/components/site/AuthCard";
+import Turnstile, { Honeypot } from "@/components/site/Turnstile";
 
 export default function SignupPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", plate: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [token, setToken] = useState("");
+  const [company, setCompany] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -19,7 +22,7 @@ export default function SignupPage() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, turnstileToken: token, company }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -66,7 +69,7 @@ export default function SignupPage() {
         </>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 relative">
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">Full name</label>
           <input
@@ -106,6 +109,9 @@ export default function SignupPage() {
             className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
+
+        <Honeypot value={company} onChange={setCompany} />
+        <Turnstile onToken={setToken} />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/supabase";
 import { findDriverByEmail } from "@/lib/data/drivers";
 import { sendMail } from "@/lib/mail";
+import { gateForm, rateHit } from "@/lib/protect";
 
 /**
  * "Forgot your password?" A recovery link is made for the account and sent
@@ -11,9 +12,13 @@ import { sendMail } from "@/lib/mail";
  */
 export async function POST(request) {
   const body = await request.json().catch(() => null);
+  const blocked = await gateForm(request, body, { form: "forgot", limit: 5 });
+  if (blocked) return blocked;
   const email = String(body?.email || "").trim().toLowerCase();
   const reply = NextResponse.json({ ok: true, message: "If that email has an account, a link to choose a new password is on its way. Check junk mail too." });
   if (!email) return reply;
+  // three reset emails an hour per address - enough for anyone, not enough to flood a mailbox
+  if (!(await rateHit(`forgot:email:${email}`, 3, 3600))) return reply;
   try {
     const driver = await findDriverByEmail(email);
     if (!driver) return reply;

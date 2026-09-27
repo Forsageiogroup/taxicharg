@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sendMail } from "@/lib/mail";
+import { gateForm } from "@/lib/protect";
 
 /**
  * "Apply to join": the office sets people up - a terminal has to be
@@ -10,6 +11,8 @@ import { sendMail } from "@/lib/mail";
  */
 export async function POST(request) {
   const body = await request.json().catch(() => null);
+  const blocked = await gateForm(request, body, { form: "signup", limit: 5 });
+  if (blocked) return blocked;
   if (!body?.name || !body?.email || !body?.phone) {
     return NextResponse.json({ error: "Name, email and phone are required." }, { status: 400 });
   }

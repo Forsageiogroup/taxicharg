@@ -11,14 +11,15 @@ export function Mark({ size = 32, className = "" }) {
     <svg width={size} height={size} viewBox="0 0 100 100" className={className} aria-hidden="true">
       <rect width="100" height="100" rx="24" fill="#0e2148" />
       <g transform="translate(7 7) scale(0.86)">
-        <rect x="39" y="13" width="14" height="7" rx="2.5" fill="#56cd7b"/>
-        <rect x="25" y="19" width="42" height="33" rx="9" fill="#56cd7b"/>
+        <rect x="34" y="8" width="24" height="12" rx="2.5" fill="#04ff7f"/>
+        <text x="46.0" y="16.59" textAnchor="middle" fontFamily="Poppins, Urbanist, Arial Black, sans-serif" fontWeight="700" fontSize="7.2" fill="#0e2148">TAXI</text>
+        <rect x="25" y="19" width="42" height="33" rx="9" fill="#04ff7f"/>
         <rect x="31" y="25" width="30" height="15" rx="4" fill="#fff"/>
-        <rect x="12" y="44" width="68" height="36" rx="8" fill="#56cd7b"/>
+        <rect x="12" y="44" width="68" height="36" rx="8" fill="#04ff7f"/>
         <rect x="17" y="55" width="12" height="6" rx="3" fill="#fff"/>
         <rect x="63" y="55" width="12" height="6" rx="3" fill="#fff"/>
-        <rect x="18" y="78" width="12" height="9" rx="2.5" fill="#3fb068"/>
-        <rect x="62" y="78" width="12" height="9" rx="2.5" fill="#3fb068"/>
+        <rect x="18" y="78" width="12" height="9" rx="2.5" fill="#03c963"/>
+        <rect x="62" y="78" width="12" height="9" rx="2.5" fill="#03c963"/>
         <polygon points="63,7 36,52 51,52 42,93 72,40 57,40" fill="#0e2148" stroke="#0e2148" strokeWidth="3.2" strokeLinejoin="round"/>
         <polygon points="63,7 36,52 51,52 42,93 72,40 57,40" fill="#fff"/>
         <path d="M70.61 25.12 A8 8 0 0 1 79.88 31.61" fill="none" stroke="#fff" strokeWidth="4.2" strokeLinecap="round"/>

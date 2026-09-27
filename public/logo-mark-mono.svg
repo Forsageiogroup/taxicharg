@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
 <rect width="100" height="100" rx="24" fill="#0e2148"/>
-<rect x="39" y="13" width="14" height="7" rx="2.5" fill="#ffffff"/>
+<rect x="34" y="8" width="24" height="12" rx="2.5" fill="#ffffff"/>
+<text x="46.0" y="16.59" text-anchor="middle" font-family="Poppins, Urbanist, Arial Black, sans-serif" font-weight="700" font-size="7.2" fill="#0e2148">TAXI</text>
 <rect x="25" y="19" width="42" height="33" rx="9" fill="#ffffff"/>
 <rect x="31" y="25" width="30" height="15" rx="4" fill="#fff"/>
 <rect x="12" y="44" width="68" height="36" rx="8" fill="#ffffff"/>

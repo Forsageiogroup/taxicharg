@@ -12,12 +12,13 @@
   --navy-600: #34424f;
   --navy-500: #4a5a68;
 
-  /* 26 Sept: the orange is gone. TaxiCharg is a green taxi on deep navy. */
+  /* 26 Sept: the orange is gone. TaxiCharg is a green taxi on deep navy.
+     27 Sept: the green is the owner's Sign up button green, #04ff7f. */
   --navy-deep: #0e2148;
-  --green-600: #3fb068;
-  --green-500: #56cd7b;
-  --green-400: #7adb97;
-  --green-300: #a8e8bc;
+  --green-600: #03c963;
+  --green-500: #04ff7f;
+  --green-400: #4dff9f;
+  --green-300: #99ffc9;
   --lime-500: #64e008;
 }
 
@@ -64,7 +65,7 @@ body {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
     inset 0 -2px 0 rgba(10, 60, 30, 0.22),
-    0 12px 26px -12px rgba(63, 176, 104, 0.65);
+    0 12px 26px -12px rgba(3, 201, 99, 0.65);
 }
 .brand-gradient::after {
   content: "";

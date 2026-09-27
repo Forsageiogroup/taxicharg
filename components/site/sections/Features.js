@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock, Percent, Smartphone, RefreshCw, Route } from "lucide-react";
 import DashboardMock from "../art/DashboardMock";
+import Reveal from "../motion/Reveal";
 
 const features = [
   {
@@ -27,16 +28,16 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="bg-white py-20 overflow-hidden">
+    <section id="features" className="bg-white py-20 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Instant pay, with the dashboard */}
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="relative">
+          <Reveal className="relative">
             <div className="absolute -inset-6 rounded-[2rem] bg-green-50 -rotate-2" />
             <DashboardMock className="relative rotate-[-2deg] hover:rotate-0 transition-transform duration-500" />
-          </div>
-          <div>
-            <span className="inline-flex items-center gap-2 text-sm font-semibold text-green-500 uppercase tracking-wide">
+          </Reveal>
+          <Reveal delay={0.15}>
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-green-600 uppercase tracking-wide">
               <Clock className="w-4 h-4" /> Instant pay
             </span>
             <h3 className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-navy-900" style={{ textWrap: "balance" }}>
@@ -48,24 +49,24 @@ export default function Features() {
               sent to your bank, or collect cash from our office &mdash; your
               choice, every time.
             </p>
-            <Link href="/driver-card" className="inline-flex items-center gap-1.5 mt-6 font-semibold text-green-500 hover:text-green-600">
+            <Link href="/driver-card" className="inline-flex items-center gap-1.5 mt-6 font-semibold text-green-600 hover:text-navy-900">
               About the Driver Card &rarr;
             </Link>
-          </div>
+          </Reveal>
         </div>
 
         {/* the rest, as a list */}
         <div className="mt-20 grid md:grid-cols-2 gap-x-14 gap-y-10">
-          {features.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="flex gap-5">
+          {features.map(({ icon: Icon, title, body }, i) => (
+            <Reveal key={title} delay={(i % 2) * 0.12} className="flex gap-5">
               <span className="w-12 h-12 rounded-xl brand-gradient flex items-center justify-center shrink-0">
-                <Icon className="w-6 h-6 text-white" />
+                <Icon className="w-6 h-6 text-navy-deep" />
               </span>
               <div>
                 <h4 className="text-xl font-extrabold text-navy-900">{title}</h4>
                 <p className="mt-2 text-navy-600 leading-relaxed">{body}</p>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

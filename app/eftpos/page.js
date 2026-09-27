@@ -2,6 +2,8 @@ import Link from "next/link";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import SubpageHero from "@/components/site/SubpageHero";
+import SubNav from "@/components/site/SubNav";
+import Reveal from "@/components/site/motion/Reveal";
 import { CheckCircle2, Wifi, Shield, Zap } from "lucide-react";
 
 const features = [
@@ -14,29 +16,31 @@ export default function EftposPage() {
   return (
     <>
       <Navbar />
+      <SubNav title="Taxi EFTPOS machine" />
       <main className="flex-1">
         <SubpageHero
+          seed={13}
           eyebrow="Taxi EFTPOS machine"
           title="A terminal built for the back seat"
           subtitle="Compact, reliable EFTPOS hardware that pairs with your TaxiCharg account so every fare settles straight to you."
         />
 
-        <section className="py-16 sm:py-20 bg-white">
+        <section className="py-16 sm:py-20 tc-grid">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-8">
-            {features.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-2xl border border-navy-900/5 p-8 card-shadow">
+            {features.map(({ icon: Icon, title, text }, i) => (
+              <Reveal key={title} delay={i * 0.1} className="rounded-2xl border border-navy-900/5 p-8 card-shadow">
                 <div className="w-12 h-12 rounded-xl brand-gradient flex items-center justify-center mb-5">
-                  <Icon className="w-6 h-6 text-white" />
+                  <Icon className="w-6 h-6 text-navy-deep" />
                 </div>
                 <h3 className="font-bold text-navy-900">{title}</h3>
                 <p className="mt-2 text-sm text-navy-600">{text}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </section>
 
-        <section className="py-16 bg-navy-950/[0.02]">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <section className="py-16 tc-wash">
+          <Reveal className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-extrabold text-navy-900 text-center">What's in the box</h2>
             <ul className="mt-8 grid sm:grid-cols-2 gap-4">
               {[
@@ -52,11 +56,11 @@ export default function EftposPage() {
               ))}
             </ul>
             <div className="text-center mt-10">
-              <Link href="/signup" className="inline-block px-7 py-3.5 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
+              <Link href="/signup" className="inline-block px-7 py-3.5 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90">
                 Get Started Now
               </Link>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
       <Footer />

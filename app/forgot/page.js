@@ -22,7 +22,7 @@ export default function ForgotPage() {
         <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
           className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
         {msg && <p className="text-sm text-navy-700">{msg}</p>}
-        <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
+        <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90">
           {loading && <Loader2 className="w-4 h-4 animate-spin" />} Send the link
         </button>
       </form>

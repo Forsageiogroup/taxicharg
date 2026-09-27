@@ -1,13 +1,15 @@
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import SubpageHero from "@/components/site/SubpageHero";
+import SubNav from "@/components/site/SubNav";
 
 export default function LegalPage({ title, updated, draft = true, children }) {
   return (
     <>
       <Navbar />
+      <SubNav title={title} />
       <main className="flex-1">
-        <SubpageHero eyebrow="Legal" title={title} subtitle={`Last updated ${updated}`} />
+        <SubpageHero seed={41} eyebrow="Legal" title={title} subtitle={`Last updated ${updated}`} />
         <section className="py-16 bg-white">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             {draft && (

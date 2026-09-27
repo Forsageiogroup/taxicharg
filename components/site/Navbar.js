@@ -17,17 +17,19 @@ export default function Navbar() {
   const [supportOpen, setSupportOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-navy-950/95 backdrop-blur border-b border-white/10 text-white">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-navy-900/8 text-navy-900">
+      {/* the brand green, as a band along the very top of every page */}
+      <div className="tc-topline h-1" />
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="shrink-0">
-          <Logo dark className="text-lg sm:text-xl" />
+          <Logo className="text-lg sm:text-xl" />
         </Link>
 
-        <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-white/85">
-          <Link href="/eftpos" className="hover:text-green-400 transition-colors">
+        <div className="hidden lg:flex items-center gap-8 text-sm font-semibold text-navy-700">
+          <Link href="/eftpos" className="hover:text-green-600 transition-colors">
             Taxi EFTPOS machine
           </Link>
-          <Link href="/driver-card" className="hover:text-green-400 transition-colors">
+          <Link href="/driver-card" className="hover:text-green-600 transition-colors">
             TaxiCharg Driver Card
           </Link>
           <div
@@ -35,7 +37,7 @@ export default function Navbar() {
             onMouseEnter={() => setSupportOpen(true)}
             onMouseLeave={() => setSupportOpen(false)}
           >
-            <button className="flex items-center gap-1 hover:text-green-400 transition-colors">
+            <button className="flex items-center gap-1 hover:text-green-600 transition-colors">
               Services &amp; support <ChevronDown className="w-4 h-4" />
             </button>
             {supportOpen && (
@@ -59,20 +61,20 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3">
           <Link
             href="/login"
-            className="px-4 py-2 text-sm font-semibold text-white/90 hover:text-green-400 transition-colors"
+            className="px-4 py-2 rounded-full text-sm font-semibold text-navy-900 border border-navy-900/15 hover:border-green-500 hover:text-green-600 transition-colors"
           >
             Login
           </Link>
           <Link
             href="/signup"
-            className="px-5 py-2.5 rounded-full text-sm font-semibold text-white brand-gradient hover:opacity-90 transition-opacity"
+            className="px-5 py-2.5 rounded-full text-sm font-semibold text-navy-deep brand-gradient hover:opacity-90 transition-opacity"
           >
             Sign up
           </Link>
         </div>
 
         <button
-          className="lg:hidden p-2 text-white"
+          className="lg:hidden p-2 text-navy-900"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
         >
@@ -81,28 +83,28 @@ export default function Navbar() {
       </nav>
 
       {open && (
-        <div className="lg:hidden border-t border-white/10 bg-navy-950 px-4 pb-4 pt-2 space-y-1">
-          <Link href="/eftpos" className="block py-2 text-white/90 font-medium">
+        <div className="lg:hidden border-t border-navy-900/8 bg-white px-4 pb-4 pt-2 space-y-1">
+          <Link href="/eftpos" className="block py-2 text-navy-900 font-medium">
             Taxi EFTPOS machine
           </Link>
-          <Link href="/driver-card" className="block py-2 text-white/90 font-medium">
+          <Link href="/driver-card" className="block py-2 text-navy-900 font-medium">
             TaxiCharg Driver Card
           </Link>
           {supportLinks.map((l) => (
-            <Link key={l.href} href={l.href} className="block py-2 pl-3 text-white/70">
+            <Link key={l.href} href={l.href} className="block py-2 pl-3 text-navy-600">
               {l.label}
             </Link>
           ))}
           <div className="flex gap-3 pt-3">
             <Link
               href="/login"
-              className="flex-1 text-center px-4 py-2 rounded-full border border-white/20 font-semibold text-white"
+              className="flex-1 text-center px-4 py-2 rounded-full border border-navy-900/15 font-semibold text-navy-900"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="flex-1 text-center px-4 py-2 rounded-full font-semibold text-white brand-gradient"
+              className="flex-1 text-center px-4 py-2 rounded-full font-semibold text-navy-deep brand-gradient"
             >
               Sign up
             </Link>

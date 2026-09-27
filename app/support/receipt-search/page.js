@@ -5,6 +5,7 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import SubpageHero from "@/components/site/SubpageHero";
 import { Search } from "lucide-react";
+import SubNav from "@/components/site/SubNav";
 
 export default function ReceiptSearchPage() {
   const [query, setQuery] = useState({ reference: "", date: "" });
@@ -13,20 +14,22 @@ export default function ReceiptSearchPage() {
   return (
     <>
       <Navbar />
+      <SubNav title="Receipt search" />
       <main className="flex-1">
         <SubpageHero
+          seed={37}
           eyebrow="Receipt search"
           title="Find a fare receipt"
           subtitle="Passengers and drivers can look up a receipt using the trip reference or date."
         />
-        <section className="py-16 sm:py-20 bg-white">
+        <section className="py-16 sm:py-20 tc-grid">
           <div className="mx-auto max-w-xl px-4 sm:px-6 lg:px-8">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 setSearched(true);
               }}
-              className="rounded-2xl border border-navy-900/5 card-shadow p-6 sm:p-8 space-y-4"
+              className="rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 sm:p-8 space-y-4"
             >
               <div>
                 <label className="block text-sm font-medium text-navy-700 mb-1.5">Trip reference</label>
@@ -48,7 +51,7 @@ export default function ReceiptSearchPage() {
               </div>
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90"
               >
                 <Search className="w-4 h-4" /> Search
               </button>

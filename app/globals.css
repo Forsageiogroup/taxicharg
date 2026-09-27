@@ -20,6 +20,9 @@
   --green-400: #4dff9f;
   --green-300: #99ffc9;
   --lime-500: #64e008;
+  /* the light green wash behind alternate sections and icon tiles */
+  --green-50: #edfff5;
+  --green-100: #d6ffe8;
 }
 
 @theme inline {
@@ -39,6 +42,8 @@
   --color-green-400: var(--green-400);
   --color-green-300: var(--green-300);
   --color-lime-500: var(--lime-500);
+  --color-green-50: var(--green-50);
+  --color-green-100: var(--green-100);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -151,4 +156,55 @@ body {
 .tc-coin-4 { top: 120px; left: -14px; animation-delay: 2.4s; }
 @media (prefers-reduced-motion: reduce) {
   .tc-tap, .tc-ring, .tc-float, .tc-float-late, .tc-coin { animation: none; }
+}
+
+/* ── the green site (27 Sept) ──────────────────────────────────────────── */
+/* The header is white now, with the brand green as a thin band along the
+   very top - the mark and the green buttons carry the colour. */
+.tc-topline {
+  background-image: linear-gradient(90deg, var(--green-600), var(--green-500) 55%, var(--lime-500));
+}
+/* a faint sheen over the facets so headline areas read a touch calmer */
+.tc-facet-veil {
+  background-image:
+    radial-gradient(90% 80% at 20% 30%, rgba(255, 255, 255, 0.28), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.06));
+}
+.tc-facet-veil-deep {
+  background-image:
+    radial-gradient(80% 70% at 15% 20%, rgba(4, 255, 127, 0.14), transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35));
+}
+/* white sections get a faint facet grid so the theme carries through */
+.tc-grid {
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(rgba(3, 201, 99, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(3, 201, 99, 0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center top;
+}
+.tc-wash { background-color: var(--green-50); }
+
+/* reveal-on-scroll (components/site/motion/Reveal.js) */
+.tc-reveal {
+  transition: opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: opacity, transform;
+}
+.tc-reveal-hidden { opacity: 0; transform: translateY(28px); }
+
+/* the sticky sub-menu (components/site/SubNav.js) */
+.tc-subnav {
+  transform: translateY(-110%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.35s ease, opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+.tc-subnav-in { transform: none; opacity: 1; visibility: visible; transition-delay: 0s; }
+.tc-subnav { margin-bottom: -3rem; } /* it floats over the page, taking no room */
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-reveal { transition: none; }
+  .tc-reveal-hidden { opacity: 1; transform: none; }
+  .tc-subnav { transition: none; }
 }

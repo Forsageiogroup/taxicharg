@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send } from "lucide-react";
+import Reveal from "../motion/Reveal";
 
 export default function ContactCTA() {
   const [status, setStatus] = useState("idle");
@@ -25,9 +26,9 @@ export default function ContactCTA() {
   }
 
   return (
-    <section id="contact" className="py-20 navy-gradient text-white">
+    <section id="contact" className="py-20 bg-navy-deep text-white">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
-        <div>
+        <Reveal>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
             Ready to put more money in your pocket?
           </h2>
@@ -35,7 +36,7 @@ export default function ContactCTA() {
             Leave your details and one of our driver specialists will call
             you back to get you set up on TaxiCharg.
           </p>
-        </div>
+        </Reveal>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 sm:p-8 card-shadow space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
@@ -73,7 +74,7 @@ export default function ContactCTA() {
           <button
             type="submit"
             disabled={status === "sending"}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60"
           >
             <Send className="w-4 h-4" />
             {status === "sending" ? "Sending..." : "Contact Sales"}

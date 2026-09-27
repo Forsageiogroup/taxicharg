@@ -3,6 +3,8 @@ import CardArt from "@/components/site/art/CardArt";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import SubpageHero from "@/components/site/SubpageHero";
+import SubNav from "@/components/site/SubNav";
+import Reveal from "@/components/site/motion/Reveal";
 import { Clock, Wallet, ShieldCheck, Smartphone } from "lucide-react";
 
 const features = [
@@ -16,40 +18,42 @@ export default function DriverCardPage() {
   return (
     <>
       <Navbar />
+      <SubNav title="TaxiCharg Driver Card" />
       <main className="flex-1">
         <SubpageHero
+          seed={17}
           eyebrow="TaxiCharg Driver Card"
           title="Your earnings, ready the moment you clock off"
           subtitle="The TaxiCharg Driver Card is where your settled fares land automatically — no waiting on a bank transfer."
         />
 
-        <section className="py-16 sm:py-20 bg-white">
+        <section className="py-16 sm:py-20 tc-grid">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-14 items-center">
-            <div className="flex justify-center">
+            <Reveal className="flex justify-center">
               <CardArt className="w-80 sm:w-96 h-auto" />
-            </div>
+            </Reveal>
             <div className="grid sm:grid-cols-2 gap-6">
-              {features.map(({ icon: Icon, title, text }) => (
-                <div key={title}>
-                  <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center mb-3">
-                    <Icon className="w-5 h-5 text-green-500" />
+              {features.map(({ icon: Icon, title, text }, i) => (
+                <Reveal key={title} delay={0.1 + i * 0.08}>
+                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mb-3">
+                    <Icon className="w-5 h-5 text-green-600" />
                   </div>
                   <h3 className="font-bold text-navy-900 text-sm">{title}</h3>
                   <p className="mt-1 text-sm text-navy-600">{text}</p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-16 navy-gradient text-white text-center">
-          <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+        <section className="py-16 bg-navy-deep text-white text-center">
+          <Reveal className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl sm:text-3xl font-extrabold">Order your card in minutes</h2>
             <p className="mt-3 text-white/70">Sign up as a driver and we'll get your card on its way.</p>
-            <Link href="/signup" className="inline-block mt-8 px-7 py-3.5 rounded-full font-semibold brand-gradient hover:opacity-90">
+            <Link href="/signup" className="inline-block mt-8 px-7 py-3.5 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90">
               Get Started Now
             </Link>
-          </div>
+          </Reveal>
         </section>
       </main>
       <Footer />

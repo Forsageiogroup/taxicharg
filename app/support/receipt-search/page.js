@@ -63,6 +63,10 @@ export default function ReceiptSearchPage() {
                 <a href="/support/contact" className="font-semibold text-green-600">
                   contact support
                 </a>
+                . If the charge itself looks wrong,{" "}
+                <a href="/support/query-a-charge" className="font-semibold text-green-600">
+                  query the charge
+                </a>
                 .
               </p>
             )}

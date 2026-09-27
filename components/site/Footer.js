@@ -17,6 +17,7 @@ const columns = [
     links: [
       { href: "/support/contact", label: "Contact" },
       { href: "/support/receipt-search", label: "Receipt search" },
+      { href: "/support/query-a-charge", label: "Query a card charge" },
       { href: "/support/referral", label: "Referral program" },
       { href: "/about", label: "About" },
     ],

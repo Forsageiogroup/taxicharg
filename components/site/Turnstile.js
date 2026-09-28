@@ -64,12 +64,21 @@ export default function Turnstile({ onToken, className = "" }) {
   return <div ref={box} className={className} />;
 }
 
+/**
+ * The field must look like nothing a browser recognises. It used to be
+ * labelled "Company" with name="company" - Chrome took that for part of an
+ * address form and filled it in from the person's saved address (28 Sept:
+ * the owner could not log in; on the Join form it would have swallowed a
+ * real application while saying "thanks"). Chrome ignores autocomplete="off"
+ * on fields it thinks it knows, so the name and label are deliberately
+ * meaningless. The posted key stays `company`, the API is unchanged.
+ */
 export function Honeypot({ value, onChange }) {
   return (
     <div aria-hidden="true" className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden">
       <label>
-        Company
-        <input type="text" name="company" tabIndex={-1} autoComplete="off" value={value} onChange={(e) => onChange(e.target.value)} />
+        Leave this blank
+        <input type="text" name="tc_x7" id="tc_x7" tabIndex={-1} autoComplete="off" data-lpignore="true" data-1p-ignore="true" value={value} onChange={(e) => onChange(e.target.value)} />
       </label>
     </div>
   );

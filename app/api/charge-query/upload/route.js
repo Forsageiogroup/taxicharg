@@ -24,7 +24,10 @@ export async function POST(request) {
   if (!(size > 0) || size > MAX) return NextResponse.json({ error: "That file is over 10 MB. A photo from your phone is fine - just not the original scan." }, { status: 400 });
 
   const safe = String(body?.fileName || "file").replace(/[^a-zA-Z0-9.\-_]/g, "_").slice(-80);
-  const path = `charge_query/${Date.now()}-${Math.random().toString(36).slice(2)}-${safe}`;
+  // charge_query/ for a card charge query (the office sees it on the record);
+  // contact/ for the contact form (a link goes in the office email)
+  const kind = body?.kind === "contact" ? "contact" : "charge_query";
+  const path = `${kind}/${Date.now()}-${Math.random().toString(36).slice(2)}-${safe}`;
   const bucket = process.env.SUPABASE_STORAGE_BUCKET || "applications";
   const { data, error } = await db().storage.from(bucket).createSignedUploadUrl(path);
   if (error || !data) {

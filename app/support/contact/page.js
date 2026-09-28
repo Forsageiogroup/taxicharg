@@ -14,7 +14,7 @@ export default function ContactPage() {
           seed={29}
           eyebrow="Contact"
           title="Talk to the TaxiCharg team"
-          subtitle="Questions about signing up, your account, or a payment? We're here to help."
+          subtitle="Questions about signing up, your account, a payment or a fare? Write to us, or come and see us in Greenacre."
         />
         <ContactCTA />
       </main>

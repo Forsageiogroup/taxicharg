@@ -63,7 +63,7 @@ export async function POST(request) {
       paragraphs: [
         `Hi ${name.split(" ")[0]},`,
         `We have received your message${topic ? " about " + topic.toLowerCase() : ""}. One of the team will come back to you by email or phone.`,
-        "If it is urgent, reply to this email or call the office on 1300 926 117.",
+        "If it is urgent, reply to this email.",
       ],
     });
   } else {

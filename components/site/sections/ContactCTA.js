@@ -16,7 +16,7 @@ import Turnstile, { Honeypot } from "../Turnstile";
  */
 const OFFICE = {
   email: "support@taxicharg.com.au",
-  phone: "1300 926 117",
+  phone: "", // TaxiCharg's own number, when the owner gives it - the row shows once set
   address: ["43-45 Claremont Ave", "Greenacre NSW 2190"],
   maps: "https://www.google.com/maps/search/?api=1&query=43-45+Claremont+Ave+Greenacre+NSW+2190",
   hours: "", // e.g. "Monday - Friday, 9:00am - 5:00pm" - shown only when set
@@ -99,7 +99,9 @@ export default function ContactCTA() {
               <div className="flex gap-4 rounded-xl bg-white border border-navy-900/5 card-shadow px-5 py-4"><Clock className="w-5 h-5 text-green-600 shrink-0 mt-0.5" /><div className="text-navy-800">{OFFICE.hours}</div></div>
             )}
             <a href={`mailto:${OFFICE.email}`} className="flex gap-4 rounded-xl bg-white border border-navy-900/5 card-shadow px-5 py-4 hover:border-green-500 transition-colors"><Mail className="w-5 h-5 text-green-600 shrink-0 mt-0.5" /><div className="font-semibold text-green-700">{OFFICE.email}</div></a>
-            <a href={`tel:${OFFICE.phone.replace(/\s/g, "")}`} className="flex gap-4 rounded-xl bg-white border border-navy-900/5 card-shadow px-5 py-4 hover:border-green-500 transition-colors"><Phone className="w-5 h-5 text-green-600 shrink-0 mt-0.5" /><div><div className="font-semibold text-green-700">{OFFICE.phone}</div><div className="text-sm text-navy-500">The office, for drivers and passengers</div></div></a>
+            {OFFICE.phone && (
+              <a href={`tel:${OFFICE.phone.replace(/\s/g, "")}`} className="flex gap-4 rounded-xl bg-white border border-navy-900/5 card-shadow px-5 py-4 hover:border-green-500 transition-colors"><Phone className="w-5 h-5 text-green-600 shrink-0 mt-0.5" /><div><div className="font-semibold text-green-700">{OFFICE.phone}</div><div className="text-sm text-navy-500">The office, for drivers and passengers</div></div></a>
+            )}
             <div className="flex gap-4 rounded-xl bg-white border border-navy-900/5 card-shadow px-5 py-4"><MapPin className="w-5 h-5 text-green-600 shrink-0 mt-0.5" /><div><div className="font-semibold text-navy-900">Driver service centre</div><div className="text-navy-700">{OFFICE.address[0]}<br />{OFFICE.address[1]}</div><a href={OFFICE.maps} target="_blank" rel="noopener" className="inline-block mt-1.5 text-sm font-semibold text-green-600">Get directions &rarr;</a><div className="mt-1.5 text-sm text-navy-500">Terminals are collected and swapped here.</div></div></div>
           </div>
           <div className="mt-7 rounded-xl bg-green-50 border border-green-600/15 px-5 py-4 text-sm text-navy-700">

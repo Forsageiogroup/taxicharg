@@ -190,7 +190,7 @@ export default function QueryAChargePage() {
                     ))}
                   </ol>
                   <button type="button" onClick={() => setStarted(true)} className={`${primary} mt-4`}>Let&rsquo;s proceed <ArrowRight className="w-4 h-4" /></button>
-                  <p className="mt-4 text-sm text-navy-500">Need help along the way? Call <strong className="text-navy-800">1300 926 117</strong> or email <a href="mailto:incident@sydcabs.au" className="font-semibold text-green-600">incident@sydcabs.au</a>.</p>
+                  <p className="mt-4 text-sm text-navy-500">Need help along the way? Email <a href="mailto:support@taxicharg.com.au" className="font-semibold text-green-600">support@taxicharg.com.au</a>.</p>
                 </Reveal>
                 <div className="space-y-5">
                   {[

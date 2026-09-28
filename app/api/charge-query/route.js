@@ -31,7 +31,7 @@ export async function POST(request) {
   const blocked = await gateForm(request, body, { form: "charge-query", limit: 5 });
   if (blocked) return blocked;
   if (!process.env.PARTNER_SUBMIT_SECRET) {
-    return NextResponse.json({ error: "This form is not switched on yet. Please email incident@sydcabs.au with the details." }, { status: 503 });
+    return NextResponse.json({ error: "This form is not switched on yet. Please email support@taxicharg.com.au with the details." }, { status: 503 });
   }
 
   const name = str(body?.name, 120), email = str(body?.email), phone = e164(body?.phone);
@@ -64,6 +64,6 @@ export async function POST(request) {
     return NextResponse.json({ ok: true, reference: out.reference || null, track: `${ORIGIN}/application-status.html` + (out.reference ? `?ref=${encodeURIComponent(out.reference)}` : "") });
   } catch (err) {
     console.error("[charge-query] forward failed:", err.message || err);
-    return NextResponse.json({ error: "Could not reach the complaints system. Please try again in a minute, or email incident@sydcabs.au." }, { status: 502 });
+    return NextResponse.json({ error: "Could not reach the complaints system. Please try again in a minute, or email support@taxicharg.com.au." }, { status: 502 });
   }
 }

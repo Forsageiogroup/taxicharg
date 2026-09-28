@@ -23,7 +23,7 @@ export async function POST(request) {
       heading: "New TaxiCharg sign-up",
       paragraphs: [
         `${body.name} has applied to join TaxiCharg.`,
-        `Email: ${body.email}`, `Phone: ${body.phone}`, body.plate ? `Plate: ${body.plate}` : "", body.fleet ? `Fleet / network: ${body.fleet}` : "",
+        `Email: ${body.email}`, `Phone: ${body.phone}`, body.interest ? `Interested in: ${String(body.interest).slice(0, 80)}` : "", body.plate ? `Plate: ${String(body.plate).slice(0, 12)}` : "", body.fleet ? `Fleet / network: ${body.fleet}` : "",
         "Add them on the register (Drivers > Add > role Terminal user, brand Taxi Charge) and send the login from the panel.",
       ].filter(Boolean),
     });

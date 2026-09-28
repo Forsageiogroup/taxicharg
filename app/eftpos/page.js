@@ -56,7 +56,7 @@ export default function EftposPage() {
               ))}
             </ul>
             <div className="text-center mt-10">
-              <Link href="/signup" className="inline-block px-7 py-3.5 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
+              <Link href="/signup" className="inline-block px-7 py-3.5 rounded-full font-semibold red-gradient">
                 Get Started Now
               </Link>
             </div>

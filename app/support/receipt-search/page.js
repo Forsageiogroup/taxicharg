@@ -51,7 +51,7 @@ export default function ReceiptSearchPage() {
               </div>
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold red-gradient"
               >
                 <Search className="w-4 h-4" /> Search
               </button>

@@ -44,7 +44,7 @@ export default function ResetPage() {
           <input required type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder="Type it again" autoComplete="new-password"
             className="w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
           {err && <p className="text-sm text-red-600">{err}</p>}
-          <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
+          <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold red-gradient">
             {loading && <Loader2 className="w-4 h-4 animate-spin" />} Save and log in
           </button>
         </form>

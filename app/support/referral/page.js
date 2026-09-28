@@ -38,7 +38,7 @@ export default function ReferralPage() {
             ))}
           </div>
           <div className="text-center mt-14">
-            <Link href="/login" className="inline-block px-7 py-3.5 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
+            <Link href="/login" className="inline-block px-7 py-3.5 rounded-full font-semibold red-gradient">
               Get your referral link
             </Link>
           </div>

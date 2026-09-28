@@ -27,7 +27,7 @@ export default function ForgotPage() {
         <Honeypot value={company} onChange={setCompany} />
         <Turnstile onToken={setToken} />
         {msg && <p className="text-sm text-navy-700">{msg}</p>}
-        <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
+        <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold red-gradient">
           {loading && <Loader2 className="w-4 h-4 animate-spin" />} Send the link
         </button>
       </form>

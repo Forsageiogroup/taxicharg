@@ -39,7 +39,7 @@ const STEPS = ["Your contact details", "About the charge", "Your evidence"];
 const input = "w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm text-navy-900 focus:outline-none focus:ring-2 focus:ring-green-400 bg-white";
 const label = "block text-sm font-medium text-navy-700 mb-1.5";
 const hint = "mt-1 text-xs text-navy-500";
-const primary = "inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60";
+const primary = "inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold red-gradient transition-opacity disabled:opacity-60";
 const secondary = "inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-navy-800 border border-navy-900/15 hover:border-green-500 hover:text-green-600 transition-colors";
 
 function Field({ l, children, h }) {

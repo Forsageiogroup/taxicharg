@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Loader2, MessageSquareText, PartyPopper, Phone, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/site/Navbar";
@@ -38,7 +38,11 @@ const input = "w-full rounded-lg border border-white/0 bg-white px-4 py-3 text-s
 const label = "block text-[11px] font-bold uppercase tracking-wider text-white mb-1.5";
 
 export default function SignupPage() {
-  const [form, setForm] = useState({ first: "", last: "", phone: "", email: "", interest: "", plate: "" });
+  const [form, setForm] = useState({ first: "", last: "", phone: "", email: "", interest: "", plate: "", ref: "" });
+  // the share link carries the friend's code: /signup?ref=TC-XXXXXX
+  useEffect(() => {
+    try { const r = new URLSearchParams(window.location.search).get("ref"); if (r) setForm((f) => ({ ...f, ref: r.toUpperCase() })); } catch {}
+  }, []);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -62,6 +66,7 @@ export default function SignupPage() {
           name: `${form.first.trim()} ${form.last.trim()}`.trim(),
           email: form.email.trim(), phone: form.phone.trim(), plate: form.plate.trim(),
           interest: (INTERESTS.find((i) => i[0] === form.interest) || [])[1] || "",
+          ref: form.ref.trim().toUpperCase(),
           turnstileToken: token, company,
         }),
       });
@@ -174,6 +179,7 @@ export default function SignupPage() {
                           </select>
                         </div>
                         <div><label className={label}>Taxi plate <span className="normal-case font-medium text-white/70">(optional)</span></label><input className={`${input} uppercase placeholder:normal-case`} value={form.plate} onChange={set("plate")} placeholder="If you have one already" /></div>
+                        <div className="sm:col-span-2"><label className={label}>Referral code <span className="normal-case font-medium text-white/70">(if a driver gave you one)</span></label><input className={`${input} uppercase placeholder:normal-case font-mono tracking-widest`} value={form.ref} onChange={set("ref")} placeholder="TC-XXXXXX" maxLength={9} /><p className="mt-1.5 text-xs text-white/75">With a friend&rsquo;s code you both get $50 once you have taken $2,000 in card fares in your first 60 days. <Link href="/support/referral" className="underline">How it works</Link></p></div>
                       </div>
 
                       <Honeypot value={company} onChange={setCompany} />

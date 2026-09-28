@@ -9,6 +9,8 @@ import PageHeader from "@/components/dashboard/PageHeader";
 import MetricCard from "@/components/dashboard/MetricCard";
 import StatusPill from "@/components/dashboard/StatusPill";
 import PeriodSelect from "@/components/dashboard/PeriodSelect";
+import ReferralCard from "@/components/dashboard/ReferralCard";
+import { OFFER, listReferralsForDriver, shareLink } from "@/lib/data/referrals";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
@@ -22,6 +24,7 @@ export default async function OverviewPage({ searchParams }) {
   const driver = await findDriverById(session.sub);
   const metrics = await getOverviewMetrics(driver.id, period);
   const recent = await listPaymentsForDriver(driver.id, { limit: 6 });
+  const referrals = await listReferralsForDriver(driver.id);
 
   return (
     <div>
@@ -104,6 +107,10 @@ export default async function OverviewPage({ searchParams }) {
             Withdraw funds now
           </Link>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <ReferralCard code={driver.referralCode} link={driver.referralCode ? shareLink(driver.referralCode) : ""} offer={OFFER} referrals={referrals} />
       </div>
     </div>
   );

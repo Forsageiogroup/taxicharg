@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sendMail } from "@/lib/mail";
 import { gateForm } from "@/lib/protect";
+import { findDriverByReferralCode, recordReferral } from "@/lib/data/referrals";
 
 /**
  * "Apply to join": the office sets people up - a terminal has to be
@@ -16,6 +17,14 @@ export async function POST(request) {
   if (!body?.name || !body?.email || !body?.phone) {
     return NextResponse.json({ error: "Name, email and phone are required." }, { status: 400 });
   }
+  // a friend's code: remembered, so the office can link them and pay both
+  let referred = null;
+  if (body.ref) {
+    const referrer = await findDriverByReferralCode(body.ref);
+    if (!referrer) return NextResponse.json({ error: "That referral code does not match a TaxiCharg driver. Check it with your friend, or leave it blank." }, { status: 400 });
+    await recordReferral({ referrer, name: body.name, email: body.email, phone: body.phone });
+    referred = referrer;
+  }
   const to = process.env.TC_OFFICE_EMAIL;
   if (to) {
     await sendMail({
@@ -23,7 +32,7 @@ export async function POST(request) {
       heading: "New TaxiCharg sign-up",
       paragraphs: [
         `${body.name} has applied to join TaxiCharg.`,
-        `Email: ${body.email}`, `Phone: ${body.phone}`, body.interest ? `Interested in: ${String(body.interest).slice(0, 80)}` : "", body.plate ? `Plate: ${String(body.plate).slice(0, 12)}` : "", body.fleet ? `Fleet / network: ${body.fleet}` : "",
+        `Email: ${body.email}`, `Phone: ${body.phone}`, body.interest ? `Interested in: ${String(body.interest).slice(0, 80)}` : "", referred ? `Referred by: ${referred.name} (${referred.reference || ""}, code ${referred.code}) - link them on the register and the referral tracks itself` : "", body.plate ? `Plate: ${String(body.plate).slice(0, 12)}` : "", body.fleet ? `Fleet / network: ${body.fleet}` : "",
         "Add them on the register (Drivers > Add > role Terminal user, brand Taxi Charge) and send the login from the panel.",
       ].filter(Boolean),
     });

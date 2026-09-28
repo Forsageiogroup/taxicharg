@@ -16,12 +16,10 @@ export default function Partnership() {
         </Reveal>
         <Reveal delay={0.15}>
           <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-navy-900" style={{ textWrap: "balance" }}>
-            A partnership that pays
+            Give $50, get $50
           </h3>
           <p className="mt-5 text-navy-600 leading-relaxed">
-            Bring a mate who drives and you both benefit. Referral bonuses are
-            paid straight to your TaxiCharg balance once their terminal is
-            taking fares. Terms and conditions apply.
+            Know a driver who would be better off on TaxiCharg? Give them your code. When they take $2,000 in card fares in their first 60 days, you both get $50 in your TaxiCharg balance &mdash; and there is no limit to how many friends you can refer.
           </p>
           <Link href="/support/referral" className="inline-flex items-center gap-1.5 mt-6 font-semibold text-green-600 hover:text-navy-900">
             How referrals work &rarr;

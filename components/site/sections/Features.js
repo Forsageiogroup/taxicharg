@@ -60,7 +60,7 @@ export default function Features() {
           {features.map(({ icon: Icon, title, body }, i) => (
             <Reveal key={title} delay={(i % 2) * 0.12} className="flex gap-5">
               <span className="w-12 h-12 rounded-xl brand-gradient flex items-center justify-center shrink-0">
-                <Icon className="w-6 h-6 text-navy-deep" />
+                <Icon className="w-6 h-6 text-white" />
               </span>
               <div>
                 <h4 className="text-xl font-extrabold text-navy-900">{title}</h4>

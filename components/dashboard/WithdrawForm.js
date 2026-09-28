@@ -106,7 +106,7 @@ export default function WithdrawForm({ availableBalance, accountBalance, stripeC
             <button
               type="button"
               onClick={() => setAmount(String(availableBalance.toFixed(2)))}
-              className="text-xs font-semibold text-green-500 hover:text-green-600"
+              className="text-xs font-semibold text-green-600 hover:text-green-700"
             >
               Withdraw full balance
             </button>

@@ -50,7 +50,7 @@ export default function DriverCardPage() {
           <Reveal className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl sm:text-3xl font-extrabold">Order your card in minutes</h2>
             <p className="mt-3 text-white/70">Sign up as a driver and we'll get your card on its way.</p>
-            <Link href="/signup" className="inline-block mt-8 px-7 py-3.5 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90">
+            <Link href="/signup" className="inline-block mt-8 px-7 py-3.5 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
               Get Started Now
             </Link>
           </Reveal>

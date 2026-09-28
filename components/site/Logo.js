@@ -36,7 +36,7 @@ export default function Logo({ dark = false, className = "", mark = true }) {
   return (
     <span className={`inline-flex items-center gap-2 font-display font-black tracking-tight ${className}`}>
       {mark && <Mark size={30} className="w-[1.55em] h-[1.55em] shrink-0" />}
-      <span className="leading-none"><span className={neutral}>TAXI</span><span className="text-green-500">CHARG</span></span>
+      <span className="leading-none"><span className={neutral}>TAXI</span><span className="text-neon">CHARG</span></span>
     </span>
   );
 }

@@ -62,13 +62,13 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3">
           <Link
             href="/login"
-            className="px-4 py-2 rounded-full text-sm font-semibold text-navy-900 border border-navy-900/15 hover:border-green-500 hover:text-green-600 transition-colors"
+            className="px-5 py-2.5 rounded-full text-sm font-semibold red-gradient"
           >
             Login
           </Link>
           <Link
             href="/signup"
-            className="px-5 py-2.5 rounded-full text-sm font-semibold text-navy-deep brand-gradient hover:opacity-90 transition-opacity"
+            className="px-5 py-2.5 rounded-full text-sm font-semibold text-white brand-gradient hover:opacity-90 transition-opacity"
           >
             Sign up
           </Link>
@@ -99,13 +99,13 @@ export default function Navbar() {
           <div className="flex gap-3 pt-3">
             <Link
               href="/login"
-              className="flex-1 text-center px-4 py-2 rounded-full border border-navy-900/15 font-semibold text-navy-900"
+              className="flex-1 text-center px-4 py-2 rounded-full font-semibold red-gradient"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="flex-1 text-center px-4 py-2 rounded-full font-semibold text-navy-deep brand-gradient"
+              className="flex-1 text-center px-4 py-2 rounded-full font-semibold text-white brand-gradient"
             >
               Sign up
             </Link>

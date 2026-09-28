@@ -39,7 +39,7 @@ const STEPS = ["Your contact details", "About the charge", "Your evidence"];
 const input = "w-full rounded-lg border border-navy-900/10 px-4 py-2.5 text-sm text-navy-900 focus:outline-none focus:ring-2 focus:ring-green-400 bg-white";
 const label = "block text-sm font-medium text-navy-700 mb-1.5";
 const hint = "mt-1 text-xs text-navy-500";
-const primary = "inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60";
+const primary = "inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60";
 const secondary = "inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-navy-800 border border-navy-900/15 hover:border-green-500 hover:text-green-600 transition-colors";
 
 function Field({ l, children, h }) {
@@ -168,7 +168,7 @@ export default function QueryAChargePage() {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             {done ? (
               <Reveal className="mx-auto max-w-xl rounded-2xl bg-white border border-navy-900/5 card-shadow p-8 sm:p-10 text-center">
-                <span className="mx-auto w-14 h-14 rounded-full brand-gradient flex items-center justify-center"><Check className="w-7 h-7 text-navy-deep" /></span>
+                <span className="mx-auto w-14 h-14 rounded-full brand-gradient flex items-center justify-center"><Check className="w-7 h-7 text-white" /></span>
                 <h2 className="mt-5 text-2xl font-extrabold text-navy-900">Thanks — we have your query</h2>
                 {done.reference && <div className="mt-3 text-4xl font-extrabold tracking-wide text-green-600 tabular-nums">{done.reference}</div>}
                 <p className="mt-4 text-navy-600 leading-relaxed">We have emailed you a copy with this reference. Quote it if you contact us. The complaints team will come back to you within five business days.</p>
@@ -214,7 +214,7 @@ export default function QueryAChargePage() {
                     const n = i + 1, cur = n === step, doneStep = n < step;
                     return (
                       <div key={t} className={`flex items-center gap-3 px-5 py-4 border-b-4 ${cur ? "border-green-500" : "border-transparent"} ${!cur ? "hidden sm:flex" : "flex"}`}>
-                        <span className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-extrabold ${cur ? "brand-gradient text-navy-deep" : doneStep ? "bg-navy-deep text-green-400" : "border-2 border-navy-900/15 text-navy-500"}`}>{doneStep ? <Check className="w-5 h-5" /> : n}</span>
+                        <span className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-extrabold ${cur ? "brand-gradient text-white" : doneStep ? "bg-navy-deep text-green-400" : "border-2 border-navy-900/15 text-navy-500"}`}>{doneStep ? <Check className="w-5 h-5" /> : n}</span>
                         <div className="min-w-0">
                           <div className="text-[11px] uppercase tracking-wider font-semibold text-green-600">Step {n} of 3</div>
                           <div className={`text-sm font-semibold ${cur || doneStep ? "text-navy-900" : "text-navy-500"}`}>{t}</div>

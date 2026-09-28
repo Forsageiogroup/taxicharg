@@ -62,7 +62,7 @@ export default function SubNav({ title, items = [], cta = { href: "/signup", lab
         <Link
           href={cta.href}
           tabIndex={shown ? 0 : -1}
-          className="shrink-0 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold text-navy-deep brand-gradient"
+          className="shrink-0 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold red-gradient"
         >
           {cta.label} <ArrowRight className="w-3.5 h-3.5" />
         </Link>

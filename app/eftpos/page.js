@@ -30,7 +30,7 @@ export default function EftposPage() {
             {features.map(({ icon: Icon, title, text }, i) => (
               <Reveal key={title} delay={i * 0.1} className="rounded-2xl border border-navy-900/5 p-8 card-shadow">
                 <div className="w-12 h-12 rounded-xl brand-gradient flex items-center justify-center mb-5">
-                  <Icon className="w-6 h-6 text-navy-deep" />
+                  <Icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-navy-900">{title}</h3>
                 <p className="mt-2 text-sm text-navy-600">{text}</p>
@@ -56,7 +56,7 @@ export default function EftposPage() {
               ))}
             </ul>
             <div className="text-center mt-10">
-              <Link href="/signup" className="inline-block px-7 py-3.5 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90">
+              <Link href="/signup" className="inline-block px-7 py-3.5 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
                 Get Started Now
               </Link>
             </div>

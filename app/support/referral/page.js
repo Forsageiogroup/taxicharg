@@ -29,7 +29,7 @@ export default function ReferralPage() {
             {steps.map(({ icon: Icon, title, text }, i) => (
               <Reveal key={title} delay={i * 0.12} className="text-center">
                 <div className="w-14 h-14 mx-auto rounded-2xl brand-gradient flex items-center justify-center mb-5">
-                  <Icon className="w-7 h-7 text-navy-deep" />
+                  <Icon className="w-7 h-7 text-white" />
                 </div>
                 <p className="text-xs font-semibold text-green-600">Step {i + 1}</p>
                 <h3 className="mt-1 font-bold text-navy-900">{title}</h3>
@@ -38,7 +38,7 @@ export default function ReferralPage() {
             ))}
           </div>
           <div className="text-center mt-14">
-            <Link href="/login" className="inline-block px-7 py-3.5 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90">
+            <Link href="/login" className="inline-block px-7 py-3.5 rounded-full font-semibold text-white brand-gradient hover:opacity-90">
               Get your referral link
             </Link>
           </div>

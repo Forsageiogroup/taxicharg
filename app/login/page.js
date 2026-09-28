@@ -103,7 +103,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MailCheck className="w-4 h-4" />}
             Continue
@@ -128,7 +128,7 @@ function LoginForm() {
       footer={
         <>
           New to TaxiCharg?{" "}
-          <Link href="/signup" className="font-semibold text-green-500 hover:text-green-600">
+          <Link href="/signup" className="font-semibold text-green-600 hover:text-green-700">
             Apply to join
           </Link>
         </>
@@ -184,7 +184,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-navy-deep brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white brand-gradient hover:opacity-90 transition-opacity disabled:opacity-60"
         >
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
           Log in
@@ -196,7 +196,7 @@ function LoginForm() {
       </form>
 
       <p className="mt-5 text-center text-sm">
-        <Link href="/forgot" className="font-semibold text-green-500 hover:text-green-600">Forgot your password?</Link>
+        <Link href="/forgot" className="font-semibold text-green-600 hover:text-green-700">Forgot your password?</Link>
       </p>
     </AuthCard>
   );

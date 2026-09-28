@@ -5,22 +5,22 @@ import Facets from "./art/Facets";
 export default function AuthCard({ title, subtitle, children, footer }) {
   return (
     <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/2 text-navy-deep p-14 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 text-white p-14 flex-col justify-between relative overflow-hidden">
         <Facets seed={43} cols={9} rows={9} className="absolute inset-0 w-full h-full" />
         <div className="tc-facet-veil absolute inset-0" />
         <Link href="/" className="relative">
-          <Logo className="text-2xl" />
+          <Logo dark className="text-2xl" />
         </Link>
         <div className="relative">
           <p className="text-3xl font-extrabold leading-snug max-w-md">
             More fares in your pocket, faster than ever.
           </p>
-          <p className="mt-4 text-navy-deep/80 font-medium max-w-sm">
+          <p className="mt-4 text-white/80 max-w-sm">
             Manage your payments, connect your terminal and bank payouts,
             and track every fare from one dashboard.
           </p>
         </div>
-        <p className="relative text-xs text-navy-deep/70">
+        <p className="relative text-xs text-white/60">
           &copy; {new Date().getFullYear()} TaxiCharg &middot; NSW, Australia
         </p>
       </div>

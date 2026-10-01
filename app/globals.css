@@ -204,14 +204,11 @@ body {
     radial-gradient(80% 70% at 15% 20%, rgba(4, 255, 127, 0.14), transparent 60%),
     linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35));
 }
-/* white sections get a faint facet grid so the theme carries through */
+/* white sections are plain white. They carried a faint green grid until
+   1 Oct 2026; the owner: "I do not want that boxes. Just simple white." The
+   class stays on the sections so the layout does not move. */
 .tc-grid {
   background-color: #ffffff;
-  background-image:
-    linear-gradient(rgba(14, 138, 62, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 138, 62, 0.07) 1px, transparent 1px);
-  background-size: 48px 48px;
-  background-position: center top;
 }
 .tc-wash { background-color: var(--green-50); }
 

@@ -87,3 +87,4 @@ proxy.js         log-in check for /dashboard; /admin redirects to /login
 - A new dashboard tab: a folder under `app/dashboard/` and a link in
   `components/dashboard/DashboardShell.js`.
 - Logo: `public/logo.png`.
+

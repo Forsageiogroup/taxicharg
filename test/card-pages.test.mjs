@@ -5,19 +5,22 @@ import { test, mock, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 
 // ---- fake Stripe --------------------------------------------------------------------------------
-const S = { settings: [], payouts: [], creates: [], balance: { available: [{ currency: "aud", amount: 10000 }], pending: [{ currency: "aud", amount: 2100 }] } };
+const S = { settings: [], payouts: [], creates: [], ext: [{ available_payout_methods: ["standard", "instant"] }], failNext: null, balance: { available: [{ currency: "aud", amount: 10000 }], pending: [{ currency: "aud", amount: 2100 }] } };
 class FakeStripe {
   balanceSettings = { update: async (p, o) => { S.settings.push({ p, o }); return {}; } };
   balance = { retrieve: async (_p, o) => { S.lastAccount = o.stripeAccount; return S.balance; } };
   payouts = {
     list: async (_p, o) => ({ data: S.payouts.filter((x) => x.acct === o.stripeAccount) }),
     create: async (p, o) => {
+      if (S.failNext) { const e = Object.assign(new Error("stripe says no"), { code: S.failNext }); S.failNext = null; throw e; }
       const dup = S.creates.find((c) => c.o.idempotencyKey === o.idempotencyKey);
       if (dup) return dup.po;
-      const po = { id: "po_" + (S.creates.length + 1), amount: p.amount, status: "pending", created: 1793500000, arrival_date: 1793664000, acct: o.stripeAccount };
+      const po = { id: "po_" + (S.creates.length + 1), amount: p.amount, method: p.method || "standard", application_fee_amount: p.method === "instant" ? Math.max(50, Math.round(p.amount / 100)) : null,
+        status: p.method === "instant" ? "in_transit" : "pending", created: Math.floor(Date.now() / 1000), arrival_date: 1793664000, acct: o.stripeAccount };
       S.creates.push({ p, o, po }); S.payouts.unshift(po); return po;
     },
   };
+  accounts = { listExternalAccounts: async (acct) => { S.extFor = acct; return { data: S.ext }; } };
 }
 mock.module("stripe", { defaultExport: FakeStripe });
 
@@ -43,6 +46,7 @@ const { NextResponse } = await import("next/server");
 mock.module("@/lib/protect", { namedExports: { rateHit: async () => allow, tooMany: (m) => NextResponse.json({ error: m }, { status: 429 }) } });
 
 const R = await import("@/lib/money/cardReport");
+const I = await import("@/lib/money/instantCashout");
 const getRoute = await import("@/app/api/driver/card/route.js");
 const cashRoute = await import("@/app/api/driver/card/cashout/route.js");
 
@@ -54,11 +58,12 @@ const cash = (body, headers = {}) => cashRoute.POST(new Request("https://x/api/d
 const BEARER = { authorization: "Bearer tok_aslam_aaaaaaaaaaaaaaaaaaaaaa" };
 
 beforeEach(() => {
-  Object.assign(S, { settings: [], payouts: [], creates: [], balance: { available: [{ currency: "aud", amount: 10000 }], pending: [{ currency: "aud", amount: 2100 }] } });
+  Object.assign(S, { settings: [], payouts: [], creates: [], ext: [{ available_payout_methods: ["standard", "instant"] }], failNext: null, balance: { available: [{ currency: "aud", amount: 10000 }], pending: [{ currency: "aud", amount: 2100 }] } });
   cookieDriver = null; allow = true;
   accounts.clear(); accounts.set("d-9001", { account_id: "acct_1Aslam", status: "ready", livemode: false });
   rows = [pay({})];
   process.env.STRIPE_SECRET_KEY = "sk_test_x"; process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_x"; delete process.env.TC_STRIPE_LIVE;
+  for (const k of ["TC_INSTANT_CASHOUT", "TC_INSTANT_FEE_PCT", "TC_INSTANT_FEE_MIN_CENTS", "TC_INSTANT_DAY_MAX_CENTS"]) delete process.env[k];
 });
 
 // ---- what he sees ---------------------------------------------------------------------------------
@@ -163,4 +168,88 @@ test("P5 a live key on this site: no cash out", async () => {
   process.env.STRIPE_SECRET_KEY = "sk_live_x"; process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_live_x";
   assert.equal((await cash({ requestId: "req_cash_000000000011" }, BEARER)).status, 503);
   assert.equal(S.creates.length, 0);
+});
+
+// ---- tc-0018: Instant cash out (the owner, 31 Oct: instant, the driver pays 1% min $0.50; Free stays) ----
+// Stripe's balance after the fare: $120 can go instantly; with the 1% fee set in Stripe, $118.81 + $1.19 fee.
+const INSTANT_BAL = { available: [], pending: [{ currency: "aud", amount: 12000 }], instant_available: [{ currency: "aud", amount: 12000, net_available: [{ amount: 11881, destination: "ba_1" }] }] };
+
+test("I1 the fee: 1% of what he gets, at least $0.50", () => {
+  assert.equal(I.instantFeeCents(10000), 100);
+  assert.equal(I.instantFeeCents(11881), 119);
+  assert.equal(I.instantFeeCents(2000), 50);
+  assert.equal(I.instantFeeCents(0), 0);
+  assert.equal(I.instantFeeCents(10000, I.instantSettings({ TC_INSTANT_FEE_PCT: "9" })), 500, "never more than 5%");
+});
+test("I2 what can go instantly: Stripe's net amount, only when Stripe's fee is OUR fee; the daily limit", () => {
+  assert.deepEqual(I.instantView(INSTANT_BAL), { pct: 1, minFeeCents: 50, dayLeftCents: 100000, on: true, maxCents: 11881, feeOnMaxCents: 119, reason: null });
+  const noFee = { instant_available: [{ currency: "aud", amount: 12000 }] };
+  assert.equal(I.instantView(noFee).reason, "not_set_up", "fee not set in Stripe: TaxiCharg would pay it - off");
+  const wrongFee = { instant_available: [{ currency: "aud", amount: 12000, net_available: [{ amount: 11600 }] }] };
+  assert.equal(I.instantView(wrongFee).reason, "not_set_up", "a different fee in Stripe: off");
+  assert.equal(I.instantView({ instant_available: [] }).reason, "nothing");
+  assert.equal(I.instantView(INSTANT_BAL, { todayCents: 95000 }).maxCents, 5000, "at most what is left of today's $1,000");
+  assert.equal(I.instantView(INSTANT_BAL, { todayCents: 99950 }).reason, "day_limit");
+  assert.equal(I.instantView(INSTANT_BAL, { settings: I.instantSettings({ TC_INSTANT_CASHOUT: "off" }) }).reason, "off");
+});
+test("I3 Sydney days for the daily limit: 00:30 Sydney 1 Nov counts from Sydney midnight", () => {
+  assert.equal(I.sydneyDayStart(Date.parse("2026-10-31T13:30:00Z")), Date.parse("2026-10-31T13:00:00Z") / 1000);
+  const start = Date.parse("2026-10-31T13:00:00Z") / 1000;
+  const p = [{ method: "instant", amount: 5000, created: start + 10, status: "paid" }, { method: "instant", amount: 7000, created: start - 10, status: "paid" },
+    { method: "instant", amount: 3000, created: start + 20, status: "failed" }, { method: "standard", amount: 9000, created: start + 30, status: "paid" }];
+  assert.equal(I.instantTodayCents(p, Date.parse("2026-10-31T13:30:00Z")), 5000);
+});
+test("I4 the app and the page get Instant: up to $118.81, fee $1.19, 1% min $0.50 - never an account id", async () => {
+  S.balance = INSTANT_BAL;
+  const j = await (await get(BEARER)).json();
+  assert.deepEqual(j.instant, { on: true, max: 118.81, feeOnMax: 1.19, feePct: 1, feeMin: 0.5, reason: null, note: null });
+  assert.equal(S.extFor, "acct_1Aslam");
+  assert.equal(JSON.stringify(j).includes("acct_"), false);
+  S.ext = [{ available_payout_methods: ["standard"] }];
+  const k = await (await get(BEARER)).json();
+  assert.equal(k.instant.on, false); assert.match(k.instant.note, /cannot take instant cash outs/);
+});
+test("I5 Instant cash out: the most by default, method instant, its own key, once per press; the fee shown is Stripe's", async () => {
+  S.balance = INSTANT_BAL;
+  const r = await cash({ requestId: "req_inst_000000000001", method: "instant" }, BEARER);
+  assert.equal(r.status, 200);
+  const j = await r.json();
+  assert.equal(S.creates[0].p.method, "instant"); assert.equal(S.creates[0].p.amount, 11881);
+  assert.equal(S.creates[0].o.idempotencyKey, "tcinst_req_inst_000000000001"); assert.equal(S.creates[0].o.stripeAccount, "acct_1Aslam");
+  assert.equal(j.payout.instant, true); assert.equal(j.payout.amount, 118.81); assert.equal(j.payout.fee, 1.19);
+  assert.equal(j.payout.label, "On its way - about 30 minutes");
+  await cash({ requestId: "req_inst_000000000001", method: "instant" }, BEARER);
+  assert.equal(S.creates.length, 1, "the same press twice is one cash out");
+});
+test("I6 Instant: never more than allowed; refused when the fee is not set in Stripe; Stripe's refusals in his words", async () => {
+  S.balance = INSTANT_BAL;
+  let r = await cash({ requestId: "req_inst_000000000002", method: "instant", amountCents: 12000 }, BEARER);
+  assert.equal(r.status, 400); assert.match((await r.json()).error, /Up to \$118\.81/);
+  S.failNext = "instant_payouts_unsupported";
+  r = await cash({ requestId: "req_inst_000000000003", method: "instant", amountCents: 5000 }, BEARER);
+  assert.equal(r.status, 409); assert.match((await r.json()).error, /cannot take instant/);
+  S.failNext = "balance_insufficient";
+  r = await cash({ requestId: "req_inst_000000000004", method: "instant", amountCents: 5000 }, BEARER);
+  assert.equal(r.status, 400); assert.match((await r.json()).error, /Not enough in your balance/);
+  S.balance = { available: [], pending: [], instant_available: [{ currency: "aud", amount: 12000 }] };
+  r = await cash({ requestId: "req_inst_000000000005", method: "instant" }, BEARER);
+  assert.equal(r.status, 409); assert.match((await r.json()).error, /not ready yet/);
+  assert.equal(S.creates.length, 0);
+});
+test("I7 Instant: today's $1,000 limit per driver (Sydney day); switched off by TC_INSTANT_CASHOUT=off", async () => {
+  S.balance = INSTANT_BAL;
+  S.payouts = [{ id: "po_x", acct: "acct_1Aslam", method: "instant", amount: 99950, status: "paid", created: Math.floor(Date.now() / 1000) }];
+  let r = await cash({ requestId: "req_inst_000000000006", method: "instant" }, BEARER);
+  assert.equal(r.status, 400); assert.match((await r.json()).error, /today's instant cash out limit/);
+  S.payouts = [];
+  process.env.TC_INSTANT_CASHOUT = "off";
+  r = await cash({ requestId: "req_inst_000000000007", method: "instant" }, BEARER);
+  assert.equal(r.status, 409);
+  assert.equal(S.creates.length, 0);
+});
+test("I8 Free stays as it was (no method = free, its own key, no instant); an unknown method is refused", async () => {
+  assert.equal((await cash({ requestId: "req_inst_000000000008", method: "standard" }, BEARER)).status, 200);
+  assert.equal(S.creates[0].p.method, undefined); assert.equal(S.creates[0].o.idempotencyKey, "tccash_req_inst_000000000008");
+  assert.equal((await cash({ requestId: "req_inst_000000000009", method: "fast" }, BEARER)).status, 400);
+  assert.equal(S.creates.length, 1);
 });

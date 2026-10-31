@@ -6,6 +6,8 @@ import PageHeader from "@/components/dashboard/PageHeader";
 import MetricCard from "@/components/dashboard/MetricCard";
 import BarChart from "@/components/dashboard/BarChart";
 import DateRangePicker from "@/components/dashboard/DateRangePicker";
+import CloverOnly from "@/components/dashboard/CloverOnly";
+import { getDriverSummary } from "@/lib/data/payments";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
@@ -24,6 +26,8 @@ export default async function ReportsPage({ searchParams }) {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
   const driver = await findDriverById(session.sub);
+  if (!driver?.view?.clover) return <CloverOnly title="Reports" />;   // tc-0013
+  const summary = await getDriverSummary(driver.id);
 
   const metrics = await getPeriodMetrics(driver.id, { from, to });
   const weekly = await getWeeklyReport(driver.id);
@@ -64,10 +68,10 @@ export default async function ReportsPage({ searchParams }) {
           </div>
           <div className="flex items-center justify-between py-3">
             <dt className="text-navy-500">
-              Account balance
-              <span className="block text-xs text-navy-400 font-normal">Money in your account pending withdrawal</span>
+              Clover balance
+              <span className="block text-xs text-navy-400 font-normal">Clover money you can ask to be paid</span>
             </dt>
-            <dd className="font-bold text-navy-900">{currency(driver.balance)}</dd>
+            <dd className="font-bold text-navy-900">{currency(summary.availableBalance)}</dd>
           </div>
         </dl>
       </div>

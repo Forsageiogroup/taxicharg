@@ -5,6 +5,7 @@ import { findDriverById } from "@/lib/data/drivers";
 import PageHeader from "@/components/dashboard/PageHeader";
 import StatusPill from "@/components/dashboard/StatusPill";
 import EditableField from "@/components/dashboard/EditableField";
+import { getDriverSummary } from "@/lib/data/payments";
 import { Wallet, ArrowRight } from "lucide-react";
 
 const currency = (n) =>
@@ -15,6 +16,7 @@ export default async function ProfilePage() {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
   const driver = await findDriverById(session.sub);
+  const summary = driver?.view?.clover ? await getDriverSummary(driver.id) : null;   // tc-0013: Clover only
 
   const anyConnected = driver.connections.clover.connected || driver.connections.stripe.connected;
 
@@ -124,16 +126,18 @@ export default async function ProfilePage() {
         </Link>
       </div>
 
+      {summary && (
       <div className="mt-6 rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-navy-900 font-bold">
             <Wallet className="w-4 h-4" /> Your account
           </div>
-          <span className="text-sm text-navy-500 mt-2 block">Account balance</span>
-          <div className="mt-1 text-2xl font-extrabold text-navy-900">{currency(driver.balance)}</div>
+          <span className="text-sm text-navy-500 mt-2 block">Clover balance</span>
+          <div className="mt-1 text-2xl font-extrabold text-navy-900">{currency(summary.availableBalance)}</div>
           <p className="text-xs text-navy-400 mt-1">Payment method: {driver.paymentMethod}</p>
         </div>
       </div>
+      )}
     </div>
   );
 }

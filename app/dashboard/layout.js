@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
 import { findDriverById } from "@/lib/data/drivers";
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import { getDriverSummary } from "@/lib/data/payments";
 
 export default async function DashboardLayout({ children }) {
   const cookieStore = await cookies();
@@ -20,5 +21,8 @@ export default async function DashboardLayout({ children }) {
 
   const { password, ...safeDriver } = driver;
 
-  return <DashboardShell driver={safeDriver}>{children}</DashboardShell>;
+  // tc-0013: the header shows his Clover balance only while a Clover terminal is his
+  const cloverAvailable = driver.view && driver.view.clover ? (await getDriverSummary(driver.id)).availableBalance : null;
+
+  return <DashboardShell driver={safeDriver} cloverAvailable={cloverAvailable}>{children}</DashboardShell>;
 }

@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { Wallet } from "lucide-react";
+import { Wallet, Landmark } from "lucide-react";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
 import { findDriverById } from "@/lib/data/drivers";
-import { listPaymentsForDriver } from "@/lib/data/payments";
+import { listPaymentsForDriver, getDriverSummary } from "@/lib/data/payments";
+import { getPayoutAccount, shape } from "@/lib/data/stripeAccounts";
 import { getOverviewMetrics } from "@/lib/data/reports";
 import PageHeader from "@/components/dashboard/PageHeader";
 import MetricCard from "@/components/dashboard/MetricCard";
@@ -22,15 +23,19 @@ export default async function OverviewPage({ searchParams }) {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
   const driver = await findDriverById(session.sub);
-  const metrics = await getOverviewMetrics(driver.id, period);
-  const recent = await listPaymentsForDriver(driver.id, { limit: 6 });
+  const view = driver.view || { clover: false, stripe: false, none: true };
+  // tc-0013: the Clover side is read only while a Clover terminal is his
+  const metrics = view.clover ? await getOverviewMetrics(driver.id, period) : null;
+  const recent = view.clover ? await listPaymentsForDriver(driver.id, { limit: 6 }) : [];
+  const summary = view.clover ? await getDriverSummary(driver.id) : null;
+  const payout = view.stripe ? shape(await getPayoutAccount(driver.id).catch(() => null)) : null;
   const referrals = await listReferralsForDriver(driver.id);
 
   return (
     <div>
       <PageHeader
         title="Overview"
-        action={
+        action={view.clover &&
           <Link
             href="/dashboard/withdraw"
             className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border border-navy-900/10 hover:bg-navy-950/[0.03]"
@@ -40,8 +45,21 @@ export default async function OverviewPage({ searchParams }) {
         }
       />
 
+      {view.none && (
+        <div className="rounded-2xl bg-white border border-navy-900/5 card-shadow p-6">
+          <h2 className="font-bold text-navy-900">No terminal assigned yet</h2>
+          <p className="mt-2 text-sm text-navy-500 max-w-prose">
+            When TaxiCharg gives you a terminal, your fares and balance show here. You can open your
+            payout account now, so it is ready.
+          </p>
+          <Link href="/dashboard/payout-account" className="mt-4 inline-block text-sm font-semibold text-green-700 underline">Payout account</Link>
+        </div>
+      )}
+
+      {view.clover && (
+        <>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-navy-900">Key metrics</h2>
+        <h2 className="font-bold text-navy-900">Clover terminal</h2>
         <PeriodSelect value={period} />
       </div>
 
@@ -99,8 +117,8 @@ export default async function OverviewPage({ searchParams }) {
             <h2 className="font-bold text-navy-900">Your account</h2>
             <Wallet className="w-5 h-5 text-navy-300" />
           </div>
-          <span className="text-sm text-navy-500 mt-1">Account balance</span>
-          <div className="mt-1 text-3xl font-extrabold text-navy-900">{currency(driver.balance)}</div>
+          <span className="text-sm text-navy-500 mt-1">Clover balance</span>
+          <div className="mt-1 text-3xl font-extrabold text-navy-900">{currency(summary.availableBalance)}</div>
           <p className="text-xs text-navy-400 mt-1">Money in your account pending withdrawal</p>
           <Link
             href="/dashboard/withdraw"
@@ -110,6 +128,24 @@ export default async function OverviewPage({ searchParams }) {
           </Link>
         </div>
       </div>
+
+        </>
+      )}
+
+      {view.stripe && (
+        <div className={`${view.clover ? "mt-8 " : ""}rounded-2xl bg-white border border-navy-900/5 card-shadow p-6`}>
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-navy-900">TaxiCharg terminal</h2>
+            <Landmark className="w-5 h-5 text-navy-300" />
+          </div>
+          {payout && payout.status === "ready" ? (
+            <p className="mt-2 text-sm text-navy-600">Your payout account is ready. Fares you take on your TaxiCharg terminal are paid into it automatically after each trip.</p>
+          ) : (
+            <p className="mt-2 text-sm text-amber-800">Open your payout account so fares from your TaxiCharg terminal can be paid to you.</p>
+          )}
+          <Link href="/dashboard/payout-account" className="mt-4 inline-block text-sm font-semibold text-green-700 underline">Payout account</Link>
+        </div>
+      )}
 
       <div className="mt-6">
         <ReferralCard code={driver.referralCode} link={driver.referralCode ? shareLink(driver.referralCode) : ""} offer={OFFER} referrals={referrals} />

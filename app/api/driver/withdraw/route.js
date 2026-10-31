@@ -7,6 +7,10 @@ export async function POST(request) {
   const auth = await requireDriverSession();
   if (!auth) return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   const { driver } = auth;
+  // tc-0013: cashing out here is the Clover side - only while a Clover terminal is his
+  if (!driver.view || !driver.view.clover) {
+    return NextResponse.json({ error: "You don't have a Clover terminal assigned. Contact TaxiCharg support." }, { status: 403 });
+  }
 
   const body = await request.json().catch(() => null);
   const amount = Number(body?.amount);
@@ -17,7 +21,7 @@ export async function POST(request) {
   const summary = await getDriverSummary(driver.id);
 
   if (amount > summary.availableBalance + 0.01) {
-    return NextResponse.json({ error: "Amount exceeds your available balance." }, { status: 400 });
+    return NextResponse.json({ error: "Amount exceeds your available Clover balance." }, { status: 400 });
   }
 
   // tc-0012 (31 Oct 2026): the old "connected Stripe" path is gone. It sent

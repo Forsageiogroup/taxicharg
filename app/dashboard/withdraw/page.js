@@ -6,11 +6,13 @@ import { listWithdrawalsForDriver } from "@/lib/data/withdrawals";
 import PageHeader from "@/components/dashboard/PageHeader";
 import WithdrawForm from "@/components/dashboard/WithdrawForm";
 import WithdrawHistory from "@/components/dashboard/WithdrawHistory";
+import CloverOnly from "@/components/dashboard/CloverOnly";
 
 export default async function WithdrawPage() {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
   const driver = await findDriverById(session.sub);
+  if (!driver?.view?.clover) return <CloverOnly title="Withdraw funds" />;   // tc-0013
   const summary = await getDriverSummary(driver.id);
   const history = await listWithdrawalsForDriver(driver.id);
 
@@ -20,7 +22,7 @@ export default async function WithdrawPage() {
 
       <WithdrawForm
         availableBalance={summary.availableBalance}
-        accountBalance={driver.balance}
+        accountBalance={summary.balance}
         stripeConnected={false}
       />
 

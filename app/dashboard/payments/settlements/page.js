@@ -3,6 +3,8 @@ import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
 import { getSettlements } from "@/lib/data/reports";
 import PageHeader from "@/components/dashboard/PageHeader";
 import StatusPill from "@/components/dashboard/StatusPill";
+import CloverOnly from "@/components/dashboard/CloverOnly";
+import { findDriverById } from "@/lib/data/drivers";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
@@ -10,6 +12,8 @@ const currency = (n) =>
 export default async function SettlementsPage() {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
+  const driver = await findDriverById(session.sub);
+  if (!driver?.view?.clover) return <CloverOnly title="Settlements" />;   // tc-0013
   const settlements = await getSettlements(session.sub);
 
   return (

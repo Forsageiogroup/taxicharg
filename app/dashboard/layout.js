@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
-import { findDriverById } from "@/lib/data/drivers";
+import { driverForRequest as findDriverById } from "@/lib/data/request";   // tc-0014: read once per page view
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { getDriverSummary } from "@/lib/data/payments";
+import { summaryForRequest as getDriverSummary } from "@/lib/data/request";
 
 export default async function DashboardLayout({ children }) {
   const cookieStore = await cookies();

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
-import { findDriverById } from "@/lib/data/drivers";
+import { driverForRequest as findDriverById } from "@/lib/data/request";   // tc-0014: read once per page view
 import { isCloverConfigured } from "@/lib/clover";
 import Link from "next/link";
 import PageHeader from "@/components/dashboard/PageHeader";

@@ -2,8 +2,9 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { Wallet, Landmark } from "lucide-react";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
-import { findDriverById } from "@/lib/data/drivers";
-import { listPaymentsForDriver, getDriverSummary } from "@/lib/data/payments";
+import { driverForRequest as findDriverById } from "@/lib/data/request";   // tc-0014: read once per page view
+import { listPaymentsForDriver } from "@/lib/data/payments";
+import { summaryForRequest as getDriverSummary } from "@/lib/data/request";
 import { getPayoutAccount, shape } from "@/lib/data/stripeAccounts";
 import { getOverviewMetrics } from "@/lib/data/reports";
 import PageHeader from "@/components/dashboard/PageHeader";

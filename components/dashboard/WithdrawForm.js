@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Wallet, AlertTriangle, CheckCircle2, HelpCircle } from "lucide-react";
+import { Loader2, Wallet, AlertTriangle, CheckCircle2, HelpCircle, Landmark, CreditCard } from "lucide-react";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
@@ -81,6 +81,30 @@ export default function WithdrawForm({ availableBalance, accountBalance, stripeC
 
         {formOpen && (
           <form onSubmit={handleSubmit} className="mt-6 space-y-4 max-w-sm">
+            {/* tc-0014: how the money is paid. Bank transfer works now. Debit card (instant) is shown and
+                switched off until the card payout partner's service is connected - no card details are
+                asked for or kept here before then. */}
+            <fieldset>
+              <legend className="block text-sm font-medium text-navy-700 mb-1.5">Pay it to</legend>
+              <div className="space-y-2">
+                <label className="flex items-start gap-3 rounded-xl border-2 border-green-500 bg-green-50/40 px-4 py-3 cursor-pointer">
+                  <input type="radio" name="payout_method" value="bank" defaultChecked className="mt-1 accent-green-600" />
+                  <span className="flex-1">
+                    <span className="flex items-center gap-2 font-semibold text-navy-900 text-sm"><Landmark className="w-4 h-4" /> Bank transfer</span>
+                    <span className="block text-xs text-navy-500">To the bank account we have on file &middot; usually 1&ndash;2 business days</span>
+                  </span>
+                </label>
+                <label className="flex items-start gap-3 rounded-xl border border-navy-900/10 px-4 py-3 opacity-60 cursor-not-allowed" aria-disabled="true">
+                  <input type="radio" name="payout_method" value="card" disabled className="mt-1" />
+                  <span className="flex-1">
+                    <span className="flex items-center gap-2 font-semibold text-navy-900 text-sm"><CreditCard className="w-4 h-4" /> Debit card &middot; instant
+                      <span className="ml-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-semibold px-2 py-0.5">Coming soon</span></span>
+                    <span className="block text-xs text-navy-500">Withdraw straight to your debit card. We are switching this on with our card payout partner and will let you know when it is ready. TaxiCharg will never ask for your card number by email, text or phone.</span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
             <div>
               <label className="block text-sm font-medium text-navy-700 mb-1.5">Amount (AUD)</label>
               <div className="relative">

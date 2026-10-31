@@ -4,7 +4,7 @@ import { listPaymentsForDriver } from "@/lib/data/payments";
 import PageHeader from "@/components/dashboard/PageHeader";
 import PaymentsTable from "@/components/dashboard/PaymentsTable";
 import CloverOnly from "@/components/dashboard/CloverOnly";
-import { findDriverById } from "@/lib/data/drivers";
+import { driverForRequest as findDriverById } from "@/lib/data/request";   // tc-0014: read once per page view
 
 export default async function TransactionsPage() {
   const cookieStore = await cookies();

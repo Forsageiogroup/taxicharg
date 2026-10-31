@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
-import { findDriverById } from "@/lib/data/drivers";
+import { driverForRequest as findDriverById } from "@/lib/data/request";   // tc-0014: read once per page view
 import PageHeader from "@/components/dashboard/PageHeader";
 import StatusPill from "@/components/dashboard/StatusPill";
 import EditableField from "@/components/dashboard/EditableField";
-import { getDriverSummary } from "@/lib/data/payments";
+import { summaryForRequest as getDriverSummary } from "@/lib/data/request";
 import { Wallet, ArrowRight } from "lucide-react";
 
 const currency = (n) =>

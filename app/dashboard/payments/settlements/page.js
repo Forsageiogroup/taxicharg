@@ -4,7 +4,7 @@ import { getSettlements } from "@/lib/data/reports";
 import PageHeader from "@/components/dashboard/PageHeader";
 import StatusPill from "@/components/dashboard/StatusPill";
 import CloverOnly from "@/components/dashboard/CloverOnly";
-import { findDriverById } from "@/lib/data/drivers";
+import { driverForRequest as findDriverById } from "@/lib/data/request";   // tc-0014: read once per page view
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);

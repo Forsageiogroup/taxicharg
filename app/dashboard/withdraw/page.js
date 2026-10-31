@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
-import { findDriverById } from "@/lib/data/drivers";
-import { getDriverSummary } from "@/lib/data/payments";
+import { driverForRequest as findDriverById } from "@/lib/data/request";   // tc-0014: read once per page view
+import { summaryForRequest as getDriverSummary } from "@/lib/data/request";
 import { listWithdrawalsForDriver } from "@/lib/data/withdrawals";
 import PageHeader from "@/components/dashboard/PageHeader";
 import WithdrawForm from "@/components/dashboard/WithdrawForm";

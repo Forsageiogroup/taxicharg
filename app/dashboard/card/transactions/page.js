@@ -6,7 +6,7 @@ import PageHeader from "@/components/dashboard/PageHeader";
 import CardPaymentsTable from "@/components/dashboard/CardPaymentsTable";
 import CardOnly from "@/components/dashboard/CardOnly";
 
-/** tc-0016: every card fare taken on his TaxiCharg terminal - fare, service charge, what is his. */
+/** tc-0016: every card fare taken on his TaxiCharg terminal - fare, his commission, what is his (tc-0017: no service charge). */
 export default async function CardTransactionsPage() {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
@@ -15,7 +15,7 @@ export default async function CardTransactionsPage() {
   if (!m.cardSide) return <CardOnly title="Card payments" />;
   return (
     <div>
-      <PageHeader title="Card payments" subtitle="Every fare taken on your TaxiCharg terminal: the fare, the service charge the passenger paid, and what is yours." />
+      <PageHeader title="Card payments" subtitle="Every fare taken on your TaxiCharg terminal: the fare, your commission and what is yours." />
       <CardPaymentsTable rows={m.rows} />
     </div>
   );

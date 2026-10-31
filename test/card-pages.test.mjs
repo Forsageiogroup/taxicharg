@@ -62,9 +62,11 @@ beforeEach(() => {
 });
 
 // ---- what he sees ---------------------------------------------------------------------------------
-test("C1 one card fare: fare, service charge, card total, commission, yours, card, in his balance", () => {
+test("C1 one card fare: fare, commission, yours, card, in his balance - and never the service charge or card total (tc-0017)", () => {
   const [r] = R.cardRows([pay({})]);
-  assert.deepEqual([r.ref, r.fare, r.serviceCharge, r.cardTotal, r.commission, r.yours, r.card], ["11111111", 100, 5, 105, 1.5, 101.5, "VISA 9969"]);
+  assert.deepEqual([r.ref, r.fare, r.commission, r.yours, r.card], ["11111111", 100, 1.5, 101.5, "VISA 9969"]);
+  assert.equal("serviceCharge" in r, false); assert.equal("cardTotal" in r, false);
+  assert.equal(JSON.stringify(r).includes("105"), false, "the card total is nowhere in his row");
   assert.equal(r.status.label, "Paid"); assert.equal(r.paidToYou.label, "In your balance");
 });
 test("C2 refunds and disputes: what was taken back is not his; not-paid fares are not listed", () => {
@@ -81,8 +83,8 @@ test("C3 the download: totals, one line per fare, Sydney time, and no Excel form
   const csv = R.cardCsv({ name: "=HYPERLINK(evil)", from: "2026-10-01", to: "2026-10-31", totals: R.cardTotals(rs), rows: rs });
   assert.match(csv, /'=HYPERLINK\(evil\)/);
   assert.match(csv, /31\/10\/2026, 23:14/);   // 12:14 UTC = 23:14 Sydney (AEDT) - as on the S710 receipt
-  assert.match(csv, /100\.00,5\.00,105\.00,1\.50,101\.50,Paid,In your balance/);
-  assert.match(csv, /Service charges paid by passengers,5\.00/);
+  assert.match(csv, /100\.00,1\.50,101\.50,Paid,In your balance/);
+  assert.equal(/service charge|card total|105\.00/i.test(csv), false, "no service charge in his download (tc-0017)");
 });
 test("C4 Sydney days: a fare at 23:14 Sydney on 31 Oct is in 31 Oct; one at 00:30 Sydney 1 Nov (13:30 UTC) is in 1 Nov", () => {
   const rs = R.cardRows([pay({}), pay({ id: "late", succeeded_at: "2026-10-31T13:30:00Z" })]);
@@ -102,6 +104,7 @@ test("A1 the app's sign-in (Bearer) gets HIS card money, and his payouts are set
   const j = await r.json();
   assert.equal(j.cardSide, true); assert.equal(j.rows.length, 1); assert.deepEqual(j.balance, { available: 100, onTheWay: 21 });
   assert.equal(j.totals.yours, 101.5);
+  assert.equal(/serviceCharge|cardTotal|surcharge|105/i.test(JSON.stringify(j)), false, "the app is never sent the service charge (tc-0017)");
   assert.equal(S.lastAccount, "acct_1Aslam");
   assert.deepEqual(S.settings[0], { p: { payments: { payouts: { schedule: { interval: "manual" } } } }, o: { stripeAccount: "acct_1Aslam" } });
   assert.equal(JSON.stringify(j).includes("acct_"), false, "his Stripe account id is never sent");

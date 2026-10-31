@@ -39,7 +39,7 @@ export default async function CardReportsPage({ searchParams }) {
         <MetricCard label="Your commission" value={currency(t.commission)} />
         <MetricCard label="Yours" value={currency(t.yours)} />
       </div>
-      <p className="mt-3 text-xs text-navy-400">Service charges paid by passengers: {currency(t.serviceCharges)}. Taken back for refunds or disputes: {currency(t.takenBack)}.</p>
+      <p className="mt-3 text-xs text-navy-400">Taken back for refunds or disputes: {currency(t.takenBack)}.</p>
       <h2 className="mt-8 mb-4 font-bold text-navy-900">Card fares in this period</h2>
       <CardPaymentsTable rows={rows} empty="No card fares in these dates." />
     </div>

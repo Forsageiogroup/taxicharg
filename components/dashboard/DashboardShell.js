@@ -14,6 +14,7 @@ import {
   LogOut,
   Menu,
   X,
+  CreditCard,
 } from "lucide-react";
 import Logo from "@/components/site/Logo";
 import IdleTimeout from "./IdleTimeout";
@@ -36,7 +37,18 @@ const NAV = [
   { href: "/dashboard/help", label: "Help", icon: HelpCircle },
 ];
 
-export default function DashboardShell({ driver, cloverAvailable, children }) {
+// tc-0016: the TaxiCharg card terminal (S710) side - his card fares, a report and Cash out.
+const CARD_GROUP = {
+  label: "Card payments",
+  icon: CreditCard,
+  children: [
+    { href: "/dashboard/card/transactions", label: "Transactions" },
+    { href: "/dashboard/card/reports", label: "Report" },
+    { href: "/dashboard/card/cashout", label: "Cash out" },
+  ],
+};
+
+export default function DashboardShell({ driver, cloverAvailable, cardSide = false, children }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -58,7 +70,18 @@ export default function DashboardShell({ driver, cloverAvailable, children }) {
   // while a Clover terminal is his. The payout account is always there (drivers
   // open it before they are given an S710).
   const CLOVER_ONLY = new Set(["Payments", "Reports", "Withdraw funds"]);
-  const nav = NAV.filter((item) => driver.view?.clover || !CLOVER_ONLY.has(item.label));
+  const clover = Boolean(driver.view?.clover);
+  // tc-0016: an S710 driver (or one with money in his payout account) gets the full card menu too;
+  // with both terminals both sides show, each named for its terminal
+  const nav = [];
+  for (const item of NAV) {
+    if (CLOVER_ONLY.has(item.label) && !clover) continue;
+    if (item.label === "Payments" && cardSide) nav.push({ ...item, label: "Clover payments" });
+    else if (item.label === "Reports" && cardSide) nav.push({ ...item, label: "Clover report" });
+    else if (item.label === "Withdraw funds" && cardSide) nav.push({ ...item, label: "Clover withdraw" });
+    else nav.push(item);
+    if (item.exact && cardSide) nav.push(CARD_GROUP);   // right after Overview
+  }
 
   const NavList = ({ onNavigate }) => (
     <nav className="flex-1 px-3 space-y-1">

@@ -140,11 +140,15 @@ export default async function OverviewPage({ searchParams }) {
             <Landmark className="w-5 h-5 text-navy-300" />
           </div>
           {payout && payout.status === "ready" ? (
-            <p className="mt-2 text-sm text-navy-600">Your payout account is ready. Fares you take on your TaxiCharg terminal are paid into it automatically after each trip.</p>
+            <p className="mt-2 text-sm text-navy-600">Your payout account is ready. Fares you take on your TaxiCharg terminal are paid into your TaxiCharg balance after each trip; you choose when to cash out to your bank.</p>
           ) : (
             <p className="mt-2 text-sm text-amber-800">Open your payout account so fares from your TaxiCharg terminal can be paid to you.</p>
           )}
-          <Link href="/dashboard/payout-account" className="mt-4 inline-block text-sm font-semibold text-green-700 underline">Payout account</Link>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+            <Link href="/dashboard/card/transactions" className="text-sm font-semibold text-green-700 underline">Card payments</Link>
+            <Link href="/dashboard/card/cashout" className="text-sm font-semibold text-green-700 underline">Cash out</Link>
+            <Link href="/dashboard/payout-account" className="text-sm font-semibold text-green-700 underline">Payout account</Link>
+          </div>
         </div>
       )}
 

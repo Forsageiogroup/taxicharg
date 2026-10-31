@@ -8,6 +8,7 @@ import {
   Receipt,
   BarChart3,
   Wallet,
+  Landmark,
   UserCircle,
   HelpCircle,
   LogOut,
@@ -30,6 +31,7 @@ const NAV = [
   },
   { href: "/dashboard/reports", label: "Reports", icon: BarChart3 },
   { href: "/dashboard/withdraw", label: "Withdraw funds", icon: Wallet },
+  { href: "/dashboard/payout-account", label: "Payout account", icon: Landmark },
   { href: "/dashboard/profile", label: "Profile", icon: UserCircle },
   { href: "/dashboard/help", label: "Help", icon: HelpCircle },
 ];

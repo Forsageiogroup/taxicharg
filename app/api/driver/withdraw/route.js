@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireDriverSession } from "@/lib/driverSession";
 import { getDriverSummary } from "@/lib/data/payments";
-import { createPayout, isStripeConfigured } from "@/lib/stripe";
 import { recordWithdrawal } from "@/lib/data/withdrawals";
 
 export async function POST(request) {
@@ -21,22 +20,12 @@ export async function POST(request) {
     return NextResponse.json({ error: "Amount exceeds your available balance." }, { status: 400 });
   }
 
-  // Stripe path: only once the driver has connected Stripe AND the server
-  // has real Stripe keys. Otherwise the withdrawal is a request to the
-  // office: it appears on the panel's payout queue and is paid from there.
-  if (driver.connections.stripe.connected && isStripeConfigured()) {
-    try {
-      const payout = await createPayout({
-        accountId: driver.connections.stripe.accountId,
-        amount,
-      });
-      await recordWithdrawal(driver.id, { amount, status: "processing" });
-      return NextResponse.json({ ok: true, mode: "live", payout });
-    } catch (err) {
-      return NextResponse.json({ error: err.message || "Payout failed." }, { status: 502 });
-    }
-  }
-
+  // tc-0012 (31 Oct 2026): the old "connected Stripe" path is gone. It sent
+  // wallet money (Clover fares) straight out as a Stripe transfer, with no
+  // check that the fares behind it were still good (no void / refund
+  // re-read). Wallet withdrawals go to the office's payout queue, as before,
+  // where the panel's Pay re-checks first. S710 fares go to the driver's own
+  // TaxiCharg payout account instead (Stripe), not through this wallet.
   const req = await recordWithdrawal(driver.id, { amount, status: "processing" });
 
   return NextResponse.json({

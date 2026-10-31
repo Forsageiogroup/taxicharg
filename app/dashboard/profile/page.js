@@ -9,7 +9,7 @@ import { Wallet, ArrowRight } from "lucide-react";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
-const formatDate = (d) => new Date(d).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+const formatDate = (d) => new Date(d).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric", timeZone: "Australia/Sydney" });
 
 export default async function ProfilePage() {
   const cookieStore = await cookies();

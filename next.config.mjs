@@ -8,6 +8,10 @@
  *                             check. Nothing else, so a script injected by
  *                             some other route has nowhere to load from
  *                             (the form-jacking the checklist warns of).
+ *                             31 Oct (tc-0012): plus what Stripe's payout-
+ *                             account form needs (connect-js.stripe.com,
+ *                             js.stripe.com, images from *.stripe.com) -
+ *                             exactly the list in Stripe's Connect docs.
  *   Strict-Transport-Security browsers keep to HTTPS for two years, and the
  *                             domain can go on the preload list.
  *   X-Frame-Options / frame-ancestors   nobody can put this site in a frame.
@@ -20,12 +24,12 @@ const dev = process.env.NODE_ENV !== "production";
 
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com`,
+  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com https://connect-js.stripe.com https://js.stripe.com`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "img-src 'self' data: blob:",
+  "img-src 'self' data: blob: https://*.stripe.com",
   "connect-src 'self' https://challenges.cloudflare.com https://*.supabase.co",
-  "frame-src https://challenges.cloudflare.com",
+  "frame-src https://challenges.cloudflare.com https://connect-js.stripe.com https://js.stripe.com",
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",

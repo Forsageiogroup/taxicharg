@@ -5,9 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "node --import ./test/register.mjs --experimental-test-module-mocks --test test/payout-account.test.mjs"
   },
   "dependencies": {
+    "@stripe/connect-js": "3.4.6",
+    "@stripe/react-connect-js": "3.4.4",
     "@supabase/supabase-js": "^2.47.0",
     "clsx": "^2.1.1",
     "jose": "^6.2.10",

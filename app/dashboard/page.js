@@ -78,6 +78,8 @@ export default async function OverviewPage({ searchParams }) {
                         month: "short",
                         hour: "2-digit",
                         minute: "2-digit",
+                        // built on the server (UTC on Vercel): show Sydney time
+                        timeZone: "Australia/Sydney",
                       })}
                     </td>
                     <td className="px-6 py-3.5 text-navy-700">{r.method}</td>

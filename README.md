@@ -43,7 +43,9 @@ send the login from the panel. The email they get is a Taxi Charge one.
 | `TC_OFFICE_EMAIL`           | where sign-up requests are sent                              |
 | `NEXT_PUBLIC_APP_URL`       | this site's address, for the Clover/Stripe redirects         |
 | `CLOVER_APP_ID`, `CLOVER_APP_SECRET`, `CLOVER_ENV` | optional; Clover connect is off until set |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | optional; Stripe connect is off until set   |
+| `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | the driver payout accounts (tc-0012). Sandbox (`sk_test_` / `pk_test_`) on staging only. Off until both are set |
+| `STRIPE_WEBHOOK_SECRET`     | optional; lets Stripe tell the site when a payout account changes |
+| `TC_STRIPE_LIVE`            | must be `yes` for a live key (`sk_live_`) to be used at all. Never set on staging |
 
 Without the mail settings nothing is sent (sign-ups are logged, resets do
 nothing) and the site says so in the server log.

@@ -21,7 +21,7 @@ export default async function WithdrawPage() {
       <WithdrawForm
         availableBalance={summary.availableBalance}
         accountBalance={driver.balance}
-        stripeConnected={driver.connections.stripe.connected}
+        stripeConnected={false}
       />
 
       <div className="mt-8">

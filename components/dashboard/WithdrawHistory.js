@@ -24,6 +24,7 @@ export default function WithdrawHistory({ driverName, history }) {
                     day: "2-digit",
                     month: "short",
                     year: "numeric",
+                    timeZone: "Australia/Sydney",
                   })}
                 </td>
                 <td className="px-6 py-3.5 text-navy-700">{driverName}</td>

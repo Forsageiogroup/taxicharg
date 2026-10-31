@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { constructWebhookEvent, isStripeConfigured } from "@/lib/stripe";
+import { constructWebhookEvent, isStripeConfigured, retrieveDriverAccount, summariseAccount } from "@/lib/stripe";
+import { findPayoutAccountByStripeId, saveAccountStatus } from "@/lib/data/stripeAccounts";
 
 /**
  * Stripe webhook receiver. Point your Stripe webhook endpoint at
@@ -26,11 +27,22 @@ export async function POST(request) {
   }
 
   switch (event.type) {
-    case "account.updated":
-      // TODO: look up the driver by event.data.object.id (Stripe account
-      // id) and sync payoutsEnabled / detailsSubmitted onto their record.
-      console.log("[stripe webhook] account.updated", event.data.object.id);
+    case "account.updated": {
+      // tc-0012: a driver's payout account changed (details checked, a
+      // capability switched on or off). The event only says WHICH account;
+      // its state is read again from Stripe, never taken from the event.
+      const accountId = event.account || event.data?.object?.id;
+      const row = accountId ? await findPayoutAccountByStripeId(accountId) : null;
+      if (row) {
+        try {
+          await saveAccountStatus(row, summariseAccount(await retrieveDriverAccount(accountId)));
+        } catch (err) {
+          console.error("[stripe webhook] account.updated refresh", accountId, err.message || err);
+          return NextResponse.json({ error: "Try again." }, { status: 500 }); // Stripe retries
+        }
+      }
       break;
+    }
     case "transfer.created":
     case "payout.paid":
       console.log(`[stripe webhook] ${event.type}`, event.data.object.id);

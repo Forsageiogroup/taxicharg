@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { verifySessionToken, DRIVER_COOKIE } from "@/lib/auth";
 import { findDriverById } from "@/lib/data/drivers";
 import { isCloverConfigured } from "@/lib/clover";
-import { isStripeConfigured } from "@/lib/stripe";
+import Link from "next/link";
 import PageHeader from "@/components/dashboard/PageHeader";
 import ConnectionCard from "@/components/dashboard/ConnectionCard";
 import StatusBanner from "@/components/dashboard/StatusBanner";
@@ -21,7 +21,6 @@ export default async function ConnectPage({ searchParams }) {
       />
 
       <StatusBanner provider="EFTPOS Terminal" code={params?.clover} />
-      <StatusBanner provider="Bank Payouts" code={params?.stripe} />
 
       <div className="grid md:grid-cols-2 gap-6">
         <ConnectionCard
@@ -37,19 +36,22 @@ export default async function ConnectPage({ searchParams }) {
           disconnectHref="/api/clover/disconnect"
           configured={isCloverConfigured()}
         />
-        <ConnectionCard
-          name="Bank Payouts"
-          description="Take card-not-present payments and send your earnings straight to your own bank account."
-          connected={driver.connections.stripe.connected}
-          detail={
-            driver.connections.stripe.connected
-              ? `Payouts enabled: ${driver.connections.stripe.payoutsEnabled ? "Yes" : "Pending"}`
-              : null
-          }
-          connectHref="/api/stripe/connect"
-          disconnectHref="/api/stripe/disconnect"
-          configured={isStripeConfigured()}
-        />
+        {/* tc-0012: bank payouts are the driver's own TaxiCharg payout account now */}
+        <div className="rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 flex flex-col">
+          <h3 className="font-bold text-navy-900 text-lg">Payout account</h3>
+          <p className="mt-3 text-sm text-navy-500 flex-1">
+            Your own TaxiCharg payout account, where your TaxiCharg terminal fares are paid and
+            where you withdraw to your bank.
+          </p>
+          <div className="mt-5">
+            <Link
+              href="/dashboard/payout-account"
+              className="w-full flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-semibold text-white brand-gradient hover:opacity-90"
+            >
+              Open payout account
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

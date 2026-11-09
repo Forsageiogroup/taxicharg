@@ -204,7 +204,10 @@ test("T7 me: Clover = a cash-out request; S710 = automatic, with Instant; no acc
   const s = await signedIn();
   let r = await post({ action: "me", key: KEY, session: s });
   assert.equal(r.j.money.kind, "request"); assert.equal(r.j.money.available, 40.25);
-  assert.equal(r.j.abn, "51824753556"); assert.equal(r.j.receiptTaxi, "T1234");   // the paired cab wins
+  assert.equal(r.j.abn, "51824753556"); assert.equal(r.j.receiptTaxi, "TC123");   // tc-0022: his own taxi number wins
+  D.extras.taxiNumber = ""; r = await post({ action: "me", key: KEY, session: s });
+  assert.equal(r.j.receiptTaxi, "T1234");   // none of his own: the paired cab's
+  D.extras.taxiNumber = "TC123";
   D.state.provider = "stripe"; D.state.plate = null;
   r = await post({ action: "me", key: KEY, session: s });
   assert.equal(r.j.money.kind, "automatic"); assert.equal(r.j.money.instant.max, 54.55); assert.equal(r.j.receiptTaxi, "TC123");
@@ -216,6 +219,9 @@ test("T8 profile: ABN and taxi number go through 362 as 'terminal'; its refusal 
   let r = await post({ action: "profile", key: KEY, session: s, abn: "53 004 085 616", taxiNumber: "t 1234" });
   assert.equal(r.status, 200);
   assert.deepEqual(D.profile[0], { d: "d1", p: { abn: "53 004 085 616", taxiNumber: "t 1234" }, via: "terminal", by: "Ali Khan (on the terminal)" });
+  r = await post({ action: "profile", key: KEY, session: s, taxiNumber: "TX99" });
+  assert.equal(r.j.taxiNumber, "TX99"); assert.equal(r.j.receiptTaxi, "TX99");   // tc-0022: what he saved is what he sees, not the paired T1234
+  D.profile.length = 1;
   r = await post({ action: "profile", key: KEY, session: s, abn: "123" });
   assert.equal(r.status, 400); assert.equal(r.j.error, "That ABN is not right. Check the 11 digits.");
   assert.equal((await post({ action: "profile", key: KEY, session: s })).status, 400);

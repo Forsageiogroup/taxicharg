@@ -154,7 +154,9 @@ async function signedIn(action, body, { kh, th, st, driverId }) {
       ok: true, name: driver.name, driverId: driver.driverId, abn: extras.abn, taxiNumber: extras.taxiNumber,
       // tc-0020: the profile as the GM terminal shows it
       authorityExpires: more.authorityExpires, since: more.since, mid: more.midLast4 ? `****${more.midLast4}` : null,
-      receiptTaxi: st.plate || extras.taxiNumber || null,   // a paired cab's own number wins on the receipt
+      // tc-0022 (the owner, 9 Nov 2026: the taxi number he types is the one shown and printed): his own taxi number
+      // wins; the paired cab's number is used only when he has not typed one
+      receiptTaxi: extras.taxiNumber || st.plate || null,
       terminal: st.terminal, provider, plate: st.plate || null, onHold: extras.onHold, money: null,
       jobs,   // tc-0020: Jobs shows in the menu only while the office allows jobs on this terminal (363, terminal.jobs)
     };
@@ -176,7 +178,7 @@ async function signedIn(action, body, { kh, th, st, driverId }) {
     if (abn == null && taxiNumber == null) return say("Nothing to change.");
     const driver = await findDriverById(driverId);
     const r = await M.setProfile(driverId, { abn, taxiNumber }, "terminal", driver?.name ? `${driver.name} (on the terminal)` : null);
-    return NextResponse.json({ ok: true, abn: r.abn || "", taxiNumber: r.taxiNumber || "", receiptTaxi: st.plate || r.taxiNumber || null });
+    return NextResponse.json({ ok: true, abn: r.abn || "", taxiNumber: r.taxiNumber || "", receiptTaxi: r.taxiNumber || st.plate || null });   // tc-0022: his own number first
   }
 
   if (action === "payments") {

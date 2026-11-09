@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Pencil, Check, X } from "lucide-react";
 
-export default function EditableField({ label, value, fieldKey }) {
+export default function EditableField({ label, value, fieldKey, hint }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");   // tc-0019: say why it was not saved (e.g. a wrong ABN)
 
   async function save() {
     setSaving(true);
@@ -20,8 +21,14 @@ export default function EditableField({ label, value, fieldKey }) {
       });
       if (res.ok) {
         setEditing(false);
+        setError("");
         router.refresh();
+      } else {
+        const j = await res.json().catch(() => ({}));
+        setError(j.error || "Not saved. Try again.");
       }
+    } catch {
+      setError("Not saved. Check your connection and try again.");
     } finally {
       setSaving(false);
     }
@@ -45,6 +52,7 @@ export default function EditableField({ label, value, fieldKey }) {
             onClick={() => {
               setDraft(value);
               setEditing(false);
+              setError("");
             }}
             className="text-navy-400 hover:text-navy-600"
           >
@@ -53,12 +61,13 @@ export default function EditableField({ label, value, fieldKey }) {
         </div>
       ) : (
         <div className="flex items-center gap-2 mt-0.5">
-          <p className="font-semibold text-navy-900">{value}</p>
+          <p className="font-semibold text-navy-900">{value || "—"}</p>
           <button onClick={() => setEditing(true)} className="text-navy-300 hover:text-green-500" aria-label={`Edit ${label}`}>
             <Pencil className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
+      {error ? <p className="text-xs text-red-600 mt-1" role="alert">{error}</p> : hint ? <p className="text-xs text-navy-400 mt-1">{hint}</p> : null}
     </div>
   );
 }

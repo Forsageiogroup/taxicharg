@@ -7,6 +7,8 @@ import StatusPill from "@/components/dashboard/StatusPill";
 import EditableField from "@/components/dashboard/EditableField";
 import { summaryForRequest as getDriverSummary } from "@/lib/data/request";
 import { Wallet, ArrowRight } from "lucide-react";
+import TerminalPin from "@/components/dashboard/TerminalPin";
+import { hasTerminalPin } from "@/lib/data/terminalMenu";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
@@ -17,6 +19,8 @@ export default async function ProfilePage() {
   const session = await verifySessionToken(cookieStore.get(DRIVER_COOKIE)?.value);
   const driver = await findDriverById(session.sub);
   const summary = driver?.view?.clover ? await getDriverSummary(driver.id) : null;   // tc-0013: Clover only
+  const onTerminal = Boolean(driver?.view?.clover || driver?.view?.stripe);   // tc-0019: the menu on his terminal
+  const pin = onTerminal ? await hasTerminalPin(driver.id).catch(() => ({ set: false })) : null;
 
   const anyConnected = driver.connections.clover.connected || driver.connections.stripe.connected;
 
@@ -47,7 +51,7 @@ export default async function ProfilePage() {
             <p className="font-semibold text-navy-900">{driver.plate || "—"}</p>
             <p className="text-xs text-navy-400 mt-1">Set by the office when your terminal is allocated.</p>
           </div>
-          <EditableField label="ABN" value={driver.abn} fieldKey="abn" />
+          <EditableField label="ABN" value={driver.abn} fieldKey="abn" hint="Printed on the receipts from your terminal. 11 digits, checked with the ATO's rule." />
         </div>
         <div className="grid sm:grid-cols-2 gap-6 mt-6 pt-6 border-t border-navy-900/5">
           <EditableField label="Phone" value={driver.phone} fieldKey="phone" />
@@ -57,6 +61,21 @@ export default async function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {onTerminal && (
+      <div className="mt-6 rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 sm:p-8">
+        <h2 className="font-bold text-navy-900">On your terminal</h2>
+        <p className="mt-1 text-sm text-navy-500">
+          The menu on your terminal shows your profile, payments, shift report and cash out. The first time on a terminal you
+          enter the TaxiCharg code we send you; after that, your PIN.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-6 mt-4">
+          <EditableField label="Taxi number on your receipts" value={driver.taxiNumber} fieldKey="taxiNumber"
+            hint={driver.plate ? `Your terminal is in ${driver.plate} - that number prints while it is.` : "Letters and numbers, like T1234. Used when your terminal is not paired with a cab."} />
+          <TerminalPin isSet={Boolean(pin && pin.set)} />
+        </div>
+      </div>
+      )}
 
       <div className="mt-6 rounded-2xl bg-white border border-navy-900/5 card-shadow p-6 sm:p-8">
         <h2 className="font-bold text-navy-900">Your terminals</h2>

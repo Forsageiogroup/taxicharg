@@ -11,7 +11,9 @@ export async function PATCH(request) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const driver = await updateDriverProfile(auth.session.sub, body);
+  let driver;
+  try { driver = await updateDriverProfile(auth.session.sub, body); }
+  catch (e) { return NextResponse.json({ error: e.message || "Not saved." }, { status: e.status || 500 }); }   // tc-0019: e.g. a wrong ABN
   if (!driver) return NextResponse.json({ error: "Driver not found." }, { status: 404 });
 
   const { password, ...safeDriver } = driver;

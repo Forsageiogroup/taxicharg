@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   CreditCard,
+  ScanLine,
 } from "lucide-react";
 import Logo from "@/components/site/Logo";
 import IdleTimeout from "./IdleTimeout";
@@ -33,6 +34,7 @@ const NAV = [
   { href: "/dashboard/reports", label: "Reports", icon: BarChart3 },
   { href: "/dashboard/withdraw", label: "Withdraw funds", icon: Wallet },
   { href: "/dashboard/payout-account", label: "Payout account", icon: Landmark },
+  { href: "/dashboard/scan", label: "Scan shift report", icon: ScanLine },   // tc-0019: takings by QR
   { href: "/dashboard/profile", label: "Profile", icon: UserCircle },
   { href: "/dashboard/help", label: "Help", icon: HelpCircle },
 ];
@@ -76,6 +78,7 @@ export default function DashboardShell({ driver, cloverAvailable, cardSide = fal
   const nav = [];
   for (const item of NAV) {
     if (CLOVER_ONLY.has(item.label) && !clover) continue;
+    if (item.label === "Scan shift report" && !clover && !driver.view?.stripe) continue;   // tc-0019: a terminal user only
     if (item.label === "Payments" && cardSide) nav.push({ ...item, label: "Clover payments" });
     else if (item.label === "Reports" && cardSide) nav.push({ ...item, label: "Clover report" });
     else if (item.label === "Withdraw funds" && cardSide) nav.push({ ...item, label: "Clover withdraw" });

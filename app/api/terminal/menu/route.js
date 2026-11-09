@@ -136,6 +136,7 @@ export async function POST(request) {
       const token = newSessionToken();
       const r = await M.signin(kh, body.pin, sha256(token));
       if (!r?.ok) return say(problemText(r?.problem, r || {}), r?.problem === "wrong_pin" ? 401 : 409, { problem: r?.problem, triesLeft: r?.triesLeft ?? null, until: r?.until || null });
+      await M.endOtherSessions(r.driverId, r.sessionId);   // tc-0023: one terminal at a time - the other one asks for his PIN again
       return NextResponse.json({ ok: true, session: token, expiresAt: r.expiresAt, firstName: st.firstName });
     }
     return say("Unknown action.");

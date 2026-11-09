@@ -13,6 +13,7 @@ mock.module("@/lib/protect", { namedExports: { rateHit: async () => allow, tooMa
 
 // ---- fake 362 ------------------------------------------------------------------------------------------
 const D = {};
+const endedOther = [];   // tc-0023
 function reset() {
   Object.assign(D, {
     state: { ok: true, terminalId: "t1", terminal: "Dev kit", brand: "clover", provider: "clover", plate: "T1234", allocationId: "a1",
@@ -34,6 +35,7 @@ mock.module("@/lib/data/terminalMenu", { namedExports: {
   },
   sessionDriver: async (kh, th) => (kh === sha(KEY) ? D.sessions.get(th) || null : null),
   signout: async (kh, th) => { D.sessions.delete(th); },
+  endOtherSessions: async (d, keep) => { endedOther.push([d, keep]); },
   setProfile: async (d, p, via, by) => {
     D.profile.push({ d, p, via, by });
     if (p.abn === "123") throw P0001("That ABN is not right. Check the 11 digits.");
@@ -189,6 +191,8 @@ test("T5 sign in: a wrong PIN says the tries left; a right one gives a session t
   assert.equal(r.status, 200); assert.ok(M.isSessionToken(r.j.session));
   const th = D.calls.at(-1)[2];
   assert.equal(th, sha(r.j.session)); assert.notEqual(th, r.j.session);
+  // tc-0023: signing in here ends his menu on any other terminal (and only after a right PIN)
+  assert.deepEqual(endedOther, [[D.state.driverId, "s1"]]);
 });
 
 // ---- signed in ---------------------------------------------------------------------------------------

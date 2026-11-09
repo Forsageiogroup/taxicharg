@@ -10,8 +10,9 @@ import { signState, verifyState } from "@/lib/auth";
 import * as M from "@/lib/data/terminalMenu";
 import {
   sha256, newSessionToken, isSessionToken, newReportCode, reportNumber, reportQrText, isPin, isCode,
-  maskPhone, maskEmail, problemText, cloverPaymentView, stripePaymentView, cleanItems,
+  maskPhone, maskEmail, problemText, cloverPaymentView, stripePaymentView, cleanItems, tripView, meterFigures,
 } from "@/lib/terminal/menu";
+import { sydneyDay, sydneyMidnight } from "@/lib/time/sydney";
 
 /**
  * tc-0019 (9 Nov 2026): the driver's menu on his terminal - FareTap on the Clover and the TaxiCharg app on the
@@ -21,7 +22,7 @@ import {
  *
  *   POST { action, key, ... }      key = the terminal app's own key (paired by the office, as for card payments)
  *
- *   hello                               -> who the terminal is given to and what he needs to sign in
+ *   hello                               -> who the terminal is given to and what he needs to sign in; jobs: the office's switch
  *   code      { channel: sms|email }    -> sends his TaxiCharg code (the first time on this terminal)
  *   checkCode { code }                  -> the terminal knows him from now on; { pinTicket } if he has no PIN yet
  *   setPin    { pin, pinTicket | session }
@@ -29,6 +30,7 @@ import {
  *   me        { session }               -> name, ABN, taxi number, terminal, cab, money on this terminal's side
  *   profile   { session, abn?, taxiNumber? }
  *   payments  { session }               -> his card payments on this terminal, last 14 days (the fare only)
+ *   trips     { session }               -> tc-0020: his meter trips today (Sydney) and their totals
  *   report    { session, items }        -> a shift report: { number, qr, from, to, payments, voided }
  *   reports   { session }               -> his last shift reports on this terminal
  *   cashout   { session, requestId, amountCents?, method? }
@@ -39,8 +41,8 @@ import {
  * The terminal app never says who the driver is: the server works it out from the register (the driver the
  * terminal is given to NOW) and 362's sign-in. Money is never taken from what the terminal says.
  */
-const ACTIONS = new Set(["hello", "code", "checkCode", "setPin", "signin", "me", "profile", "payments", "report", "reports", "cashout", "signout"]);
-const SESSION_ACTIONS = new Set(["me", "profile", "payments", "report", "reports", "cashout", "signout"]);
+const ACTIONS = new Set(["hello", "code", "checkCode", "setPin", "signin", "me", "profile", "payments", "trips", "report", "reports", "cashout", "signout"]);
+const SESSION_ACTIONS = new Set(["me", "profile", "payments", "trips", "report", "reports", "cashout", "signout"]);
 
 const say = (error, status = 400, extra = {}) => NextResponse.json({ error, ...extra }, { status });
 const fromErr = (e) => say(e?.message || "Try again.", e?.status || 500);
@@ -88,7 +90,7 @@ export async function POST(request) {
     const st = await M.signinState(kh);
     if (!st?.ok) return say(problemText(st?.problem), 409, { problem: st?.problem || "unknown" });
 
-    if (action === "hello") return NextResponse.json({ ok: true, ...stateView(st) });
+    if (action === "hello") return NextResponse.json({ ok: true, ...stateView(st), jobs: await M.jobsOn(kh) });   // tc-0020: the office's switch
 
     if (action === "code") {
       if (!(await rateHit(`tc-menu-code:${st.driverId}`, 5, 3600))) return say("Too many codes in an hour. Wait, then try again.", 429);
@@ -146,12 +148,15 @@ async function signedIn(action, body, { kh, th, st, driverId }) {
   const provider = st.provider === "stripe" ? "stripe" : "clover";
 
   if (action === "me") {
-    const [driver, extras] = await Promise.all([findDriverById(driverId), M.driverExtras(driverId)]);
+    const [driver, extras, more, jobs] = await Promise.all([findDriverById(driverId), M.driverExtras(driverId), M.profileExtras(driverId, st.terminalId), M.jobsOn(kh)]);
     if (!driver || !extras) return say("Sign in again.", 401);
     const out = {
       ok: true, name: driver.name, driverId: driver.driverId, abn: extras.abn, taxiNumber: extras.taxiNumber,
+      // tc-0020: the profile as the GM terminal shows it
+      authorityExpires: more.authorityExpires, since: more.since, mid: more.midLast4 ? `****${more.midLast4}` : null,
       receiptTaxi: st.plate || extras.taxiNumber || null,   // a paired cab's own number wins on the receipt
       terminal: st.terminal, provider, plate: st.plate || null, onHold: extras.onHold, money: null,
+      jobs,   // tc-0020: Jobs shows in the menu only while the office allows jobs on this terminal (363, terminal.jobs)
     };
     if (provider === "clover") {
       const s = await getDriverSummary(driverId);
@@ -179,6 +184,12 @@ async function signedIn(action, body, { kh, th, st, driverId }) {
     return NextResponse.json({ ok: true, payments: rows.map(provider === "stripe" ? stripePaymentView : cloverPaymentView) });
   }
 
+  if (action === "trips") {
+    const from = sydneyMidnight(sydneyDay()).toISOString(), to = new Date().toISOString();
+    const rows = await M.meterTrips(driverId, from, to);
+    return NextResponse.json({ ok: true, from, trips: rows.map(tripView), totals: meterFigures(rows) });
+  }
+
   if (action === "report") {
     const items = cleanItems(body.items, provider);
     if (items == null) return say("The list of payments is not right.");
@@ -186,6 +197,9 @@ async function signedIn(action, body, { kh, th, st, driverId }) {
     const r = await M.newShiftReport(kh, th, items, sha256(code));
     const out = { ok: true, number: r.number, qr: reportQrText(r.number, code), from: r.from, to: r.to, payments: r.payments, voided: r.voided };
     if (provider === "clover") out.cardTotal = r.cardTotal;   // the S710 driver side never shows the card total (31 Oct)
+    // tc-0020: the meter's side of the same period, as GM's shift report (trips, fares, card, cash, levy, km)
+    try { out.meter = meterFigures(await M.meterTrips(driverId, r.from, r.to, 2000)); }
+    catch (e) { out.meter = null; console.error("[terminal menu] report meter", e.message || e); }
     return NextResponse.json(out);
   }
 

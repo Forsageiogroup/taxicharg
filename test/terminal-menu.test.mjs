@@ -50,6 +50,9 @@ mock.module("@/lib/data/terminalMenu", { namedExports: {
   hasTerminalPin: async () => ({ set: true }),
   terminalPayments: async () => D.payments,
   shiftReports: async () => D.reports,
+  profileExtras: async () => ({ reference: "SD-4521", authorityExpires: "2027-03-14", since: "2026-11-08T10:02:00Z", midLast4: "0002" }),
+  meterTrips: async (d, from, to, limit) => { D.tripArgs = { d, from, to, limit }; return D.trips || []; },
+  jobsOn: async (kh) => kh === sha(KEY) && D.jobs === true,
 } });
 mock.module("@/lib/data/terminalPay", { namedExports: {
   isKey: (k) => typeof k === "string" && /^[0-9a-f]{64}$/.test(k), keyHash: sha,
@@ -135,7 +138,7 @@ test("T1 the key and the action are checked first", async () => {
 test("T2 hello says who and what is needed - no ids, no ABN", async () => {
   const r = await post({ action: "hello", key: KEY });
   assert.equal(r.status, 200);
-  assert.deepEqual(r.j, { ok: true, terminal: "Dev kit", provider: "clover", plate: "T1234", firstName: "Ali", needsCode: true, hasPin: false, lockedUntil: null });
+  assert.deepEqual(r.j, { ok: true, terminal: "Dev kit", provider: "clover", plate: "T1234", firstName: "Ali", needsCode: true, hasPin: false, lockedUntil: null, jobs: false });
 });
 
 test("T3 the code: SMS to a masked number; a failed send never shows its inner error", async () => {
@@ -293,4 +296,53 @@ test("Q3 Clover: payments not in yet are left for the Clover read; the scan stay
   // another driver cannot read it
   who = { id: "d9", name: "X", status: "active" };
   assert.equal((await scan.GET(new Request("http://x/api/driver/takings-scan?scan=11111111-1111-1111-1111-111111111111"))).status, 404);
+});
+
+// ---- tc-0020: trips and the meter's side of the shift report ---------------------------------------------
+const TRIPS = [
+  { id: "m1", ended_at: "2026-11-09T03:41:00Z", hail: true, job_no: 10412, pickup_text: "12 Smith St, Auburn NSW 2144", dropoff_text: "Lidcombe NSW 2141, Australia", total_cents: 1808, levy_cents: 132, distance_m: 7400, payment_method: "card" },
+  { id: "m2", ended_at: "2026-11-09T02:55:00Z", hail: true, job_no: 10409, pickup_text: "Auburn", dropoff_text: "Auburn", total_cents: 940, levy_cents: 132, distance_m: 2100, payment_method: "cash" },
+  { id: "m3", ended_at: "2026-11-09T01:12:00Z", hail: false, job_no: null, receipt_no: "SB-36QT6V", pickup_text: "Mascot", dropoff_text: "Greenacre", total_cents: 5430, levy_cents: 132, distance_m: 21500, payment_method: "account" },
+  { id: "m4", ended_at: "2026-11-09T00:20:00Z", hail: true, job_no: 10398, total_cents: 2715, levy_cents: 132, distance_m: 9000, payment_method: "cash", false_job_at: "2026-11-09T00:30:00Z" },
+];
+
+test("M4 suburbs, trips and the meter totals (a voided or false job does not count)", () => {
+  assert.equal(M.suburbOf("12 Smith St, Auburn NSW 2144"), "Auburn");
+  assert.equal(M.suburbOf("Lidcombe NSW 2141, Australia"), "Lidcombe");
+  assert.equal(M.suburbOf(""), "");
+  assert.deepEqual(M.tripView(TRIPS[0]), { id: "m1", at: "2026-11-09T03:41:00Z", no: "HAIL #10412", from: "Auburn", to: "Lidcombe", total: 18.08, paid: "card", voided: false });
+  assert.equal(M.tripView(TRIPS[2]).no, "SB-36QT6V");
+  assert.equal(M.tripView(TRIPS[3]).voided, true);
+  assert.deepEqual(M.meterFigures(TRIPS), { trips: 3, meterFares: 81.78, card: 18.08, cash: 9.4, other: 54.3, levy: 3.96, km: 31 });
+});
+
+test("T13 trips: today in Sydney, newest first, with the totals", async () => {
+  const s = await signedIn();
+  D.trips = TRIPS;
+  const r = await post({ action: "trips", key: KEY, session: s });
+  assert.equal(r.status, 200); assert.equal(r.j.trips.length, 4); assert.equal(r.j.totals.trips, 3);
+  assert.equal(D.tripArgs.d, "d1");
+  const fromH = new Date(D.tripArgs.from).getTime(), now = Date.now();
+  assert.ok(now - fromH < 25 * 3600e3 && now >= fromH, "from = Sydney midnight today");
+  assert.doesNotMatch(JSON.stringify(r.j), /Smith St/);   // suburbs only, never the street address
+});
+
+test("T14 the shift report carries the meter's side of the same period; me shows the GM profile", async () => {
+  const s = await signedIn();
+  D.trips = TRIPS;
+  let r = await post({ action: "report", key: KEY, session: s, items: [] });
+  assert.deepEqual(r.j.meter, { trips: 3, meterFares: 81.78, card: 18.08, cash: 9.4, other: 54.3, levy: 3.96, km: 31 });
+  assert.deepEqual([D.tripArgs.from, D.tripArgs.to, D.tripArgs.limit], ["f", "t", 2000]);
+  r = await post({ action: "me", key: KEY, session: s });
+  assert.equal(r.j.mid, "****0002"); assert.equal(r.j.authorityExpires, "2027-03-14"); assert.equal(r.j.since, "2026-11-08T10:02:00Z");
+});
+
+test("T15 the office's jobs switch: off unless 363 says on, in hello and in me", async () => {
+  assert.equal((await post({ action: "hello", key: KEY })).j.jobs, false);
+  D.jobs = true;
+  assert.equal((await post({ action: "hello", key: KEY })).j.jobs, true);
+  const s = await signedIn();
+  assert.equal((await post({ action: "me", key: KEY, session: s })).j.jobs, true);
+  D.jobs = false;
+  assert.equal((await post({ action: "me", key: KEY, session: s })).j.jobs, false);
 });

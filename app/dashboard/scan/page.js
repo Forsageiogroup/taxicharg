@@ -8,7 +8,7 @@ import ScanReport from "@/components/dashboard/ScanReport";
 export default function ScanPage() {
   return (
     <div>
-      <PageHeader title="Scan shift report" subtitle="Scan the QR at the bottom of the shift report your terminal printed. Any card payment that did not come in by itself is added - once." />
+      <PageHeader title="Scan shift report" subtitle="End your shift on the terminal, scan the QR of the shift report here, then press GET PAID." />
       <ScanReport />
     </div>
   );

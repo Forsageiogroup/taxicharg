@@ -8,6 +8,7 @@ import { cardMoney, cashOut } from "@/lib/terminal/cardMoney";
 import { sendLoginCode, sendLoginCodeSms, smsCodesEnabled, checkLoginCode } from "@/lib/loginCode";
 import { signState, verifyState } from "@/lib/auth";
 import * as M from "@/lib/data/terminalMenu";
+import { cloverFares } from "@/lib/data/reportPay";   // tc-0024
 import {
   sha256, newSessionToken, isSessionToken, newReportCode, reportNumber, reportQrText, isPin, isCode,
   maskPhone, maskEmail, problemText, cloverPaymentView, stripePaymentView, cleanItems, tripView, meterFigures,
@@ -33,9 +34,7 @@ import { sydneyDay, sydneyMidnight } from "@/lib/time/sydney";
  *   trips     { session }               -> tc-0020: his meter trips today (Sydney) and their totals
  *   report    { session, items }        -> a shift report: { number, qr, from, to, payments, voided }
  *   reports   { session }               -> his last shift reports on this terminal
- *   cashout   { session, requestId, amountCents?, method? }
- *                                          Clover: a request the office pays (as the website's Withdraw).
- *                                          S710: straight from his payout account (Instant or Free, tc-0016/0018).
+ *   cashout                             -> tc-0024: refused (410). Getting paid is End Shift + scan in TaxiCharg + GET PAID.
  *   signout   { session }
  *
  * The terminal app never says who the driver is: the server works it out from the register (the driver the
@@ -200,6 +199,8 @@ async function signedIn(action, body, { kh, th, st, driverId }) {
     const r = await M.newShiftReport(kh, th, items, sha256(code));
     const out = { ok: true, number: r.number, qr: reportQrText(r.number, code), from: r.from, to: r.to, payments: r.payments, voided: r.voided };
     if (provider === "clover") out.cardTotal = r.cardTotal;   // the S710 driver side never shows the card total (31 Oct)
+    // tc-0024: the driver's figure is his FARES - never the card total with the Service Fee (the owner, 10 Nov 2026)
+    if (provider === "clover") { try { const f = await cloverFares(r.refs); if (f != null) out.fares = f; } catch (e) { console.error("[terminal menu] report fares", e.message || e); } }
     // tc-0020: the meter's side of the same period, as GM's shift report (trips, fares, card, cash, levy, km)
     try { out.meter = meterFigures(await M.meterTrips(driverId, r.from, r.to, 2000)); }
     catch (e) { out.meter = null; console.error("[terminal menu] report meter", e.message || e); }
@@ -215,23 +216,9 @@ async function signedIn(action, body, { kh, th, st, driverId }) {
   }
 
   if (action === "cashout") {
-    const extras = await M.driverExtras(driverId);
-    if (!extras || extras.status !== "active") return say("Your account is not active. Contact the office.", 403);
-    if (extras.onHold) return say("Your account is on hold. Contact the office.", 403);
-    if (!(await rateHit(`tc-cashout:${driverId}`, 10, 3600))) return say("Too many cash outs in an hour. Try again later.", 429);
-    const driver = await findDriverById(driverId);
-    if (provider === "stripe") {
-      const r = await cashOut(driver, { requestId: body.requestId, amountCents: body.amountCents, method: body.method });
-      return NextResponse.json(r.error ? { error: r.error } : { ok: true, kind: "automatic", payout: r.payout }, { status: r.status });
-    }
-    // Clover: a request the office pays from SYD CABS's bank, checked against Clover first (as the website's Withdraw)
-    const s = await getDriverSummary(driverId);
-    const avail = Math.round(Number(s.availableBalance || 0) * 100);
-    const want = body.amountCents == null || body.amountCents === "" ? avail : Number(body.amountCents);
-    if (!Number.isInteger(want) || want <= 0) return say(avail > 0 ? "Enter an amount." : "Nothing is available to cash out yet.");
-    if (want > avail) return say(`Only $${(avail / 100).toFixed(2)} is available to cash out.`);
-    const req = await recordWithdrawal(driverId, { amount: want / 100 });
-    return NextResponse.json({ ok: true, kind: "request", payout: { id: req.id, amount: req.amount, status: req.status, at: req.date, arrival: "1-2 business days, paid by the office" } });
+    // tc-0024 (the owner, 10 Nov 2026: "so better keep one" - QR scan only): no cash out on the terminal any more.
+    // He ends his shift, scans the shift report in TaxiCharg and presses GET PAID (/api/driver/takings-pay).
+    return say("Cash out has moved: press End Shift, then scan the shift report in TaxiCharg and press GET PAID.", 410);
   }
   return say("Unknown action.");
 }

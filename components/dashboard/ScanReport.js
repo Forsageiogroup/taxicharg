@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Camera, ImageUp, Keyboard, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import GetPaid from "@/components/dashboard/GetPaid";
 
 const currency = (n) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(Number(n || 0));
 const time = (d) => (d ? new Date(d).toLocaleString("en-AU", { timeZone: "Australia/Sydney", day: "2-digit", month: "short", hour: "numeric", minute: "2-digit" }) : "");
@@ -124,7 +125,11 @@ export default function ScanReport() {
           </form>
         )}
         {busy && <p className="mt-4 flex items-center gap-2 text-sm text-navy-500"><Loader2 className="w-4 h-4 animate-spin" /> Checking every payment on the report…</p>}
-        {err && <p className="mt-4 flex items-start gap-2 text-sm text-red-700" role="alert"><XCircle className="w-4 h-4 mt-0.5 shrink-0" /> {err}</p>}
+        {err && /another driver/i.test(err) ? (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+            <p className="font-bold">Not your report</p><p>This shift report belongs to another driver. The office has been told.</p>
+          </div>
+        ) : err && <p className="mt-4 flex items-start gap-2 text-sm text-red-700" role="alert"><XCircle className="w-4 h-4 mt-0.5 shrink-0" /> {err}</p>}
       </div>
 
       {res && s && (
@@ -133,32 +138,26 @@ export default function ScanReport() {
             <h2 className="font-bold text-navy-900 font-mono">{res.report?.number || "Shift report"}</h2>
             {res.report && <p className="text-sm text-navy-500">{time(res.report.from)} – {time(res.report.to)}</p>}
           </div>
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-            <div className="rounded-xl bg-navy-50 p-3"><p className="text-2xl font-extrabold text-navy-900 tabular-nums">{s.found}</p><p className="text-xs text-navy-500">payments found</p></div>
-            <div className="rounded-xl bg-green-50 p-3"><p className="text-2xl font-extrabold text-green-700 tabular-nums">{s.creditedNow}</p><p className="text-xs text-green-800">added now{s.creditedNow ? ` · ${currency(s.creditedAmount)}` : ""}</p></div>
-            <div className="rounded-xl bg-navy-50 p-3"><p className="text-2xl font-extrabold text-navy-900 tabular-nums">{s.alreadyIn}</p><p className="text-xs text-navy-500">already in</p></div>
-            <div className="rounded-xl bg-amber-50 p-3"><p className="text-2xl font-extrabold text-amber-800 tabular-nums">{s.voided}</p><p className="text-xs text-amber-900">voided / refunded</p></div>
-          </div>
           {res.checking > 0 && !res.closed && (
-            <p className="mt-4 flex items-center gap-2 text-sm text-navy-600"><Loader2 className="w-4 h-4 animate-spin" /> Checking {res.checking} with Clover - this takes up to a minute.</p>
+            <p className="mt-4 flex items-center gap-2 text-sm text-navy-600"><Loader2 className="w-4 h-4 animate-spin" /> Checking {res.checking} card payment{res.checking === 1 ? "" : "s"} - this takes up to a minute.</p>
           )}
-          {res.closed && s.creditedNow === 0 && s.notFound === 0 && (
-            <p className="mt-4 flex items-center gap-2 text-sm text-green-700"><CheckCircle2 className="w-4 h-4" /> Everything on this report is already in your account.</p>
+          {res.closed && <GetPaid pay={res.pay} onAgain={() => { setRes(null); setErr(""); }} />}
+          {(res.items || []).length > 0 && (
+            <details className="mt-5 text-sm">
+              <summary className="cursor-pointer text-navy-500">Payments on this report ({(res.items || []).length})</summary>
+              <ul className="mt-2 divide-y divide-navy-900/5">
+                {(res.items || []).map((x) => {
+                  const [label, cls] = LABEL[x.state] || ["", ""];
+                  return (
+                    <li key={x.ref} className="py-2 flex items-center justify-between gap-3">
+                      <span className="text-navy-700 tabular-nums">{x.at ? time(x.at) : <span className="font-mono text-xs">{x.ref}</span>}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${cls}`}>{label}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </details>
           )}
-          <ul className="mt-5 divide-y divide-navy-900/5 text-sm">
-            {(res.items || []).map((x) => {
-              const [label, cls] = LABEL[x.state] || ["", ""];
-              return (
-                <li key={x.ref} className="py-2 flex items-center justify-between gap-3">
-                  <span className="text-navy-700 tabular-nums">{x.at ? time(x.at) : <span className="font-mono text-xs">{x.ref}</span>}</span>
-                  <span className="flex items-center gap-3">
-                    {x.amount != null && <span className="font-semibold text-navy-900 tabular-nums">{currency(x.amount)}</span>}
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${cls}`}>{label}</span>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
         </div>
       )}
     </div>

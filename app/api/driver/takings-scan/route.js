@@ -5,6 +5,8 @@ import { paymentById } from "@/lib/data/terminalPay";
 import { sendShare } from "@/lib/terminal/settle";
 import { scanOpen, scanClaim, scanClose, scanFor, claimsForScan } from "@/lib/data/terminalMenu";
 import { parseReport, sha256, scanSummary } from "@/lib/terminal/menu";
+import { reportShare, payView } from "@/lib/data/reportPay";
+import { driverCardOn } from "@/lib/driverCard";
 
 /**
  * tc-0019 (9 Nov 2026): TAKINGS BY QR - the driver scans the QR on his shift report (camera or a photo), or
@@ -20,6 +22,20 @@ import { parseReport, sha256, scanSummary } from "@/lib/terminal/menu";
  *   POST { text, method: camera|photo|typed }   -> { ok, scanId, report, summary, items, checking }
  *   GET  ?scan=<id>                              -> the same, as it stands now
  */
+// tc-0024: once the scan is finished, what the report pays now (GET PAID). Never stops the scan: without 368 it is null.
+async function payFor(reportId, driverId) {
+  if (!reportId) return null;
+  try {
+    const share = await reportShare(reportId);
+    const pay = share && share.driverId === driverId ? payView(share) : null;
+    if (pay && !driverCardOn()) pay.cardOn = false;   // the Driver Card button: only when the site is switched on too
+    return pay;
+  } catch (e) {
+    console.error("[takings scan] get paid", e.message || e);
+    return null;
+  }
+}
+
 const view = (x) => ({ ref: x.ref, state: x.state, amount: x.amount != null ? Math.round(Number(x.amount) * 100) / 100 : null, at: x.at || null });
 
 function merged(items, claims, closed) {
@@ -68,6 +84,7 @@ export async function POST(request) {
       ok: true, scanId: r.scanId, closed,
       report: { number: r.report.number, provider, from: r.report.from, to: r.report.to },
       summary: scanSummary(shown, closed), items: shown.map(view), checking: pendingClover,
+      pay: closed ? await payFor(r.report.id, driver.id) : null,   // tc-0024
     });
   } catch (e) {
     return NextResponse.json({ error: e.message || "Try again." }, { status: e.status || 500 });
@@ -85,7 +102,8 @@ export async function GET(request) {
     const closed = s.outcome !== "open";
     const items = merged(s.items, await claimsForScan(s.id), closed);
     return NextResponse.json({ ok: true, scanId: s.id, closed, summary: scanSummary(items, closed), items: items.map(view),
-      checking: closed ? 0 : items.filter((x) => x.state === "not_seen" || x.state === "not_credited").length });
+      checking: closed ? 0 : items.filter((x) => x.state === "not_seen" || x.state === "not_credited").length,
+      pay: closed ? await payFor(s.report_id, driver.id) : null });   // tc-0024
   } catch (e) {
     return NextResponse.json({ error: e.message || "Try again." }, { status: e.status || 500 });
   }

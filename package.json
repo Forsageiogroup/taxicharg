@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --import ./test/register.mjs --experimental-test-module-mocks --test test/payout-account.test.mjs test/terminal-view.test.mjs test/report-sydney.test.mjs test/terminal-pay.test.mjs test/card-pages.test.mjs test/terminal-menu.test.mjs"
+    "test": "node --import ./test/register.mjs --experimental-test-module-mocks --test test/payout-account.test.mjs test/terminal-view.test.mjs test/report-sydney.test.mjs test/terminal-pay.test.mjs test/card-pages.test.mjs test/terminal-menu.test.mjs test/get-paid.test.mjs test/report-fares.test.mjs"
   },
   "dependencies": {
     "@stripe/connect-js": "3.4.6",

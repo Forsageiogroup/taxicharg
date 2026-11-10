@@ -252,19 +252,14 @@ test("T10 shift report: the QR holds the number and a random code; the database 
   assert.equal("cardTotal" in r.j, false);
 });
 
-test("T11 cash out: on hold refused; Clover = request within the balance; S710 = straight to his bank", async () => {
+test("T11 tc-0024: cash out is gone from the terminal - it says how to get paid, and moves no money", async () => {
   const s = await signedIn();
-  D.extras.onHold = true;
-  assert.equal((await post({ action: "cashout", key: KEY, session: s })).status, 403);
-  D.extras.onHold = false;
-  let r = await post({ action: "cashout", key: KEY, session: s, amountCents: 5000 });
-  assert.equal(r.status, 400); assert.match(r.j.error, /Only \$40\.25/);
-  r = await post({ action: "cashout", key: KEY, session: s });
-  assert.equal(r.j.kind, "request"); assert.deepEqual(withdrawals, [{ d: "d1", amount: 40.25 }]);
+  let r = await post({ action: "cashout", key: KEY, session: s });
+  assert.equal(r.status, 410); assert.match(r.j.error, /End Shift.*scan the shift report in TaxiCharg.*GET PAID/);
   D.state.provider = "stripe";
   r = await post({ action: "cashout", key: KEY, session: s, requestId: "req_1234567890abcdef", method: "instant", amountCents: 1000 });
-  assert.equal(r.j.kind, "automatic"); assert.deepEqual(cashouts[0], { requestId: "req_1234567890abcdef", amountCents: 1000, method: "instant" });
-  assert.equal(withdrawals.length, 1);
+  assert.equal(r.status, 410);
+  assert.equal(withdrawals.length, 0); assert.equal(cashouts.length, 0);
 });
 
 test("T12 sign out ends the session", async () => {

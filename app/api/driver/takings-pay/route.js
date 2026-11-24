@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { driverFromRequest } from "@/lib/driverAuth";
 import { rateHit, tooMany } from "@/lib/protect";
-import { cashOut } from "@/lib/terminal/cardMoney";
+import { getPaidOut } from "@/lib/terminal/cardMoney";
 import { sendToCard, driverCardOn } from "@/lib/driverCard";
 import { reportShare, reportPay, reportPayDone, payView } from "@/lib/data/reportPay";
 
@@ -11,8 +11,9 @@ import { reportShare, reportPay, reportPayDone, payView } from "@/lib/data/repor
  *   POST { reportId, requestId, expect, destination: bank|card }
  *                                               -> pays every card payment on it not paid before, once ever (368)
  *     Clover terminal: a payout request the office pays, as Withdraw did.
- *     S710: the Stripe payout from his payout account (the free one), then 368 is told made / failed - a failed
- *     payout lets the payments go, so the same report can be paid later.
+ *     S710: tc-0025 - an INSTANT payout from his payout account (about 30 minutes, the 1% fee out of the report), or
+ *     the free one when it cannot go instantly; then 368 is told made / failed - a failed payout lets the payments go,
+ *     so the same report can be paid later.
  *     destination card: the TaxiCharg Driver Card (lib/driverCard.js), only when the office has switched it on.
  * expect = the amount the screen showed: if the figures changed since, nothing is paid and the new figures come back.
  * requestId = one per press: pressing twice, or a lost answer, never pays twice.
@@ -51,6 +52,7 @@ export async function POST(request) {
   if (destination === "card" && !driverCardOn()) return NextResponse.json({ ok: false, reason: "The TaxiCharg Driver Card is not switched on yet. Choose your bank." });
 
   try {
+    let bank = null;   // tc-0025: how an S710 report went to his bank
     const r = await reportPay(reportId, driver.id, driver.name, requestId, expect, destination);
     if (!r?.ok) {
       return NextResponse.json({ ok: false, reason: r?.reason || "This report cannot be paid now.", nothing: Boolean(r?.nothing),
@@ -68,14 +70,15 @@ export async function POST(request) {
     } else if (r.provider === "stripe" && r.status === "pending") {
       // the same requestId is Stripe's idempotency key, so a second press or a retry never makes a second payout
       let out;
-      try { out = await cashOut(driver, { requestId, amountCents: Math.round(Number(r.amount) * 100), method: "standard" }); }
+      try { out = await getPaidOut(driver, { requestId, amountCents: Math.round(Number(r.amount) * 100) }); }
       catch (e) { out = { error: e?.message || "The payout could not be made." }; }
       if (out?.error) {
         await reportPayDone(r.payoutId, false, null, out.error);
         return NextResponse.json({ ok: false, reason: out.error });
       }
       await reportPayDone(r.payoutId, true, out?.payout?.id || null, null);
+      bank = { method: out.method, toBank: out.toBankCents / 100, fee: out.feeCents / 100, note: out.instantWhy || null };
     }
-    return NextResponse.json({ ok: true, paid: { number: r.number || null, amount: Math.round(Number(r.amount) * 100) / 100, payments: r.payments, at: new Date().toISOString() } });
+    return NextResponse.json({ ok: true, paid: { number: r.number || null, amount: Math.round(Number(r.amount) * 100) / 100, payments: r.payments, at: new Date().toISOString(), ...(bank ? { bank } : {}) } });
   } catch (e) { return err(e); }
 }

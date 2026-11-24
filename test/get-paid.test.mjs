@@ -23,7 +23,7 @@ mock.module("@/lib/data/reportPay", { namedExports: {
 const cashouts = [];
 const cards = [];
 mock.module("@/lib/driverCard", { namedExports: { driverCardOn: () => D.cardSite === true, sendToCard: async (driver, a) => { cards.push(a); return D.card; } } });
-mock.module("@/lib/terminal/cardMoney", { namedExports: { cashOut: async (driver, a) => { cashouts.push(a); return D.cash; }, cardMoney: async () => ({}) } });
+mock.module("@/lib/terminal/cardMoney", { namedExports: { getPaidOut: async (driver, a) => { cashouts.push(a); return D.cash; }, cashOut: async () => ({ status: 500, error: "not used" }), cardMoney: async () => ({}) } });
 
 const route = await import("../app/api/driver/takings-pay/route.js");
 const post = async (body) => { const r = await route.POST(new Request("http://x/api/driver/takings-pay", { method: "POST", body: JSON.stringify(body) })); return { status: r.status, j: await r.json() }; };
@@ -33,7 +33,8 @@ const REQ = "req_1234567890abcdef";
 beforeEach(() => {
   allow = true; who = { id: "d1", name: "Aslam S.", status: "active" }; cashouts.length = 0; cards.length = 0; D.cardSite = false; D.card = { transferId: "oxy_1" };
   Object.assign(D, { payArgs: [], done: [], share: share("clover", { payments: 1, amount: 23.55, card: 24.73, serviceFee: 1.18, commission: 0, refunded: 0 }),
-    pay: () => ({ ok: true, provider: "clover", status: "made", amount: 23.55, payments: 1, number: "SR-000004", payoutId: "p1" }), cash: { status: 200, payout: { id: "po_1" } } });
+    pay: () => ({ ok: true, provider: "clover", status: "made", amount: 23.55, payments: 1, number: "SR-000004", payoutId: "p1" }),
+    cash: { status: 200, payout: { id: "po_1" }, method: "instant", toBankCents: 2860, feeCents: 50, instantWhy: null } });
 });
 
 test("G1 signed in, active, and a real report and press id", async () => {
@@ -54,11 +55,12 @@ test("G2 Clover: the payout request is made by 368 - no Stripe call", async () =
   assert.equal(cashouts.length, 0); assert.equal(D.done.length, 0);
 });
 
-test("G3 S710: the Stripe payout of exactly the report's share, same press id, then 368 is told made", async () => {
+test("G3 S710: tc-0025 - the report's share goes to his bank (instant, the fee out of it), same press id, then 368 is told made", async () => {
   D.pay = () => ({ ok: true, provider: "stripe", status: "pending", amount: 29.1, payments: 2, number: "SR-000005", payoutId: "p2" });
   const r = await post({ reportId: REP, requestId: REQ });
   assert.equal(r.j.ok, true);
-  assert.deepEqual(cashouts[0], { requestId: REQ, amountCents: 2910, method: "standard" });
+  assert.deepEqual(cashouts[0], { requestId: REQ, amountCents: 2910 });
+  assert.deepEqual(r.j.paid.bank, { method: "instant", toBank: 28.6, fee: 0.5, note: null });
   assert.deepEqual(D.done[0], { id: "p2", ok: true, po: "po_1", reason: null });
 });
 
@@ -73,7 +75,7 @@ test("G4 S710: a failed payout is reported failed (368 lets the payments go) and
 test("G5 S710 press again after it was made: no second payout", async () => {
   D.pay = () => ({ ok: true, again: true, provider: "stripe", status: "made", amount: 29.1, payments: 2, payoutId: "p2" });
   const r = await post({ reportId: REP, requestId: REQ });
-  assert.equal(r.j.ok, true); assert.equal(cashouts.length, 0);
+  assert.equal(r.j.ok, true); assert.equal(cashouts.length, 0); assert.equal(r.j.paid.bank, undefined);
 });
 
 test("G6 refused by 368: the reason and the new figures come back, nothing paid", async () => {

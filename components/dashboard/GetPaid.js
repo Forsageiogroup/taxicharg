@@ -49,6 +49,12 @@ export default function GetPaid({ pay: first, onAgain }) {
           <p className="text-3xl font-extrabold text-navy-900 tabular-nums">{currency(paid.amount)}</p>
           <p className="font-bold text-navy-900">Paid</p>
           <p className="text-sm text-navy-500">{pay.number} · {when(paid.at)}</p>
+          {paid.bank?.method === "instant" && (
+            <p className="text-sm font-semibold text-green-700">{currency(paid.bank.toBank)} in your bank in about 30 minutes · instant fee {currency(paid.bank.fee)}</p>
+          )}
+          {paid.bank?.method === "standard" && (
+            <p className="text-sm font-semibold text-navy-700">In your bank in 1-2 business days · no fee{paid.bank.note ? <span className="block font-normal text-navy-500">Not instant this time: {paid.bank.note}</span> : null}</p>
+          )}
         </div>
         {again}
       </div>

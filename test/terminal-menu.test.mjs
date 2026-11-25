@@ -20,7 +20,7 @@ function reset() {
       driverId: "d1", firstName: "Ali", needsCode: true, hasPin: false, lockedUntil: null, abn: "", taxiNumber: "" },
     sessions: new Map(), calls: [], pinSet: [], profile: [], reportArgs: null, scanArgs: null, claims: [], closed: [],
     extras: { abn: "51824753556", taxiNumber: "TC123", onHold: false, status: "active" },
-    pinResult: null, scan: null, payments: [], reports: [],
+    pinResult: null, scan: null, payments: [], reports: [], pwResult: null, pwCalls: [],
   });
 }
 const P0001 = (m) => Object.assign(new Error(m), { status: 400 });
@@ -32,6 +32,12 @@ mock.module("@/lib/data/terminalMenu", { namedExports: {
     if (D.pinResult) return D.pinResult;
     D.sessions.set(th, D.state.driverId);
     return { ok: true, sessionId: "s1", driverId: D.state.driverId, expiresAt: "2026-11-10T00:00:00Z" };
+  },
+  signinPassword: async (kh, email, password, th) => {   // tc-0026 (415)
+    D.pwCalls.push({ kh, email, password, th });
+    if (D.pwResult) return D.pwResult;
+    D.sessions.set(th, D.state.driverId);
+    return { ok: true, sessionId: "s9", driverId: D.state.driverId, expiresAt: "2026-11-26T00:00:00Z", needsDetails: true };
   },
   sessionDriver: async (kh, th) => (kh === sha(KEY) ? D.sessions.get(th) || null : null),
   signout: async (kh, th) => { D.sessions.delete(th); },
@@ -140,7 +146,8 @@ test("T1 the key and the action are checked first", async () => {
 test("T2 hello says who and what is needed - no ids, no ABN", async () => {
   const r = await post({ action: "hello", key: KEY });
   assert.equal(r.status, 200);
-  assert.deepEqual(r.j, { ok: true, terminal: "Dev kit", provider: "clover", plate: "T1234", firstName: "Ali", needsCode: true, hasPin: false, lockedUntil: null, jobs: false });
+  assert.deepEqual(r.j, { ok: true, terminal: "Dev kit", provider: "clover", plate: "T1234", firstName: "Ali", needsCode: true, hasPin: false, lockedUntil: null,
+    signinWith: "code", needsDetails: false, jobs: false });   // tc-0026: how he signs in
 });
 
 test("T3 the code: SMS to a masked number; a failed send never shows its inner error", async () => {
@@ -350,4 +357,53 @@ test("T15 the office's jobs switch: off unless 363 says on, in hello and in me",
   assert.equal((await post({ action: "me", key: KEY, session: s })).j.jobs, true);
   D.jobs = false;
   assert.equal((await post({ action: "me", key: KEY, session: s })).j.jobs, false);
+});
+
+// ---- tc-0026 (415): SYD CABS drivers sign in with their SYD CABS email and password -----------------------------
+test("T16 a SYD CABS driver: hello says password; the code and PIN are refused; the password action signs him in", async () => {
+  D.state.signinWith = "password"; D.state.needsDetails = true;
+  let r = await post({ action: "hello", key: KEY });
+  assert.equal(r.j.signinWith, "password"); assert.equal(r.j.needsDetails, true);
+  for (const a of [{ action: "code", channel: "sms" }, { action: "checkCode", code: "123456" }, { action: "setPin", pin: "4826" }, { action: "signin", pin: "4826" }]) {
+    r = await post({ ...a, key: KEY });
+    assert.equal(r.status, 409, a.action); assert.equal(r.j.problem, "use_password"); assert.match(r.j.error, /SYD CABS email and password/);
+  }
+  assert.equal(codes.sms.length + D.calls.length + D.pinSet.length, 0);   // nothing was sent, checked or set
+  // bad shapes never reach the database
+  assert.equal((await post({ action: "password", key: KEY, email: "not an email", password: "x" })).status, 400);
+  assert.equal((await post({ action: "password", key: KEY, email: "ali@sydcabs.au", password: "" })).status, 400);
+  assert.equal((await post({ action: "password", key: KEY, email: "ali@sydcabs.au", password: "y".repeat(201) })).status, 400);
+  assert.equal(D.pwCalls.length, 0);
+  // right: a session the database sees only hashed; the other terminal is signed out; the password is never sent back
+  r = await post({ action: "password", key: KEY, email: "  ali@sydcabs.au ", password: "Secret#123" });
+  assert.equal(r.status, 200); assert.ok(M.isSessionToken(r.j.session)); assert.equal(r.j.needsDetails, true);
+  assert.equal(D.pwCalls[0].email, "ali@sydcabs.au"); assert.equal(D.pwCalls[0].th, sha(r.j.session)); assert.equal(D.pwCalls[0].kh, sha(KEY));
+  assert.doesNotMatch(JSON.stringify(r.j), /Secret#123/);
+  assert.deepEqual(endedOther.at(-1), ["d1", "s9"]);
+  // the session works for the menu, and me says the details are still needed
+  D.extras.taxiNumber = "";
+  r = await post({ action: "me", key: KEY, session: r.j.session });
+  assert.equal(r.status, 200); assert.equal(r.j.needsDetails, true);
+});
+
+test("T17 the password: wrong says the tries left, then locked; another driver's login; a TaxiCharg user is told to use the code", async () => {
+  D.state.signinWith = "password"; const ended0 = endedOther.length;
+  D.pwResult = { ok: false, problem: "wrong_password", triesLeft: 3 };
+  let r = await post({ action: "password", key: KEY, email: "ali@sydcabs.au", password: "nope" });
+  assert.equal(r.status, 401); assert.equal(r.j.error, "Wrong email or password. 3 tries left."); assert.equal(r.j.triesLeft, 3);
+  assert.doesNotMatch(JSON.stringify(r.j), /nope/);
+  D.pwResult = { ok: false, problem: "locked", until: "2026-11-25T05:15:00Z" };
+  r = await post({ action: "password", key: KEY, email: "ali@sydcabs.au", password: "nope" });
+  assert.equal(r.status, 409); assert.match(r.j.error, /Too many wrong passwords\. Signing in on this terminal is locked until/); assert.doesNotMatch(r.j.error, /PIN|TaxiCharg code/);
+  D.pwResult = { ok: false, problem: "not_his_terminal" };
+  r = await post({ action: "password", key: KEY, email: "kim@sydcabs.au", password: "Other#456" });
+  assert.equal(r.status, 409); assert.equal(r.j.error, "This terminal is given to another driver.");
+  assert.equal(endedOther.length, ended0);   // no session was made, nobody signed out
+  allow = false;
+  assert.equal((await post({ action: "password", key: KEY, email: "ali@sydcabs.au", password: "x" })).status, 429);
+  allow = true;
+  // a TaxiCharg terminal user keeps the code + PIN: the password action is refused before anything is checked
+  D.state.signinWith = "code"; D.pwCalls.length = 0;
+  r = await post({ action: "password", key: KEY, email: "ali@sydcabs.au", password: "Secret#123" });
+  assert.equal(r.status, 409); assert.equal(r.j.problem, "use_code"); assert.equal(D.pwCalls.length, 0);
 });

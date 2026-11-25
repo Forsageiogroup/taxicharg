@@ -28,6 +28,9 @@ import { sydneyDay, sydneyMidnight } from "@/lib/time/sydney";
  *   checkCode { code }                  -> the terminal knows him from now on; { pinTicket } if he has no PIN yet
  *   setPin    { pin, pinTicket | session }
  *   signin    { pin }                   -> { session }   (only the sha256 of it is kept)
+ *   password  { email, password }       -> tc-0026: { session, needsDetails } - a SYD CABS driver (hello says signinWith
+ *                                          'password'); the code / PIN actions are refused for him. The password is
+ *                                          checked by the database (415) and never kept, logged or sent back.
  *   me        { session }               -> name, ABN, taxi number, terminal, cab, money on this terminal's side
  *   profile   { session, abn?, taxiNumber? }
  *   payments  { session }               -> his card payments on this terminal, last 14 days (the fare only)
@@ -40,7 +43,7 @@ import { sydneyDay, sydneyMidnight } from "@/lib/time/sydney";
  * The terminal app never says who the driver is: the server works it out from the register (the driver the
  * terminal is given to NOW) and 362's sign-in. Money is never taken from what the terminal says.
  */
-const ACTIONS = new Set(["hello", "code", "checkCode", "setPin", "signin", "me", "profile", "payments", "trips", "report", "reports", "cashout", "signout"]);
+const ACTIONS = new Set(["hello", "code", "checkCode", "setPin", "signin", "password", "me", "profile", "payments", "trips", "report", "reports", "cashout", "signout"]);
 const SESSION_ACTIONS = new Set(["me", "profile", "payments", "trips", "report", "reports", "cashout", "signout"]);
 
 const say = (error, status = 400, extra = {}) => NextResponse.json({ error, ...extra }, { status });
@@ -58,6 +61,8 @@ function stateView(st) {
   return {
     terminal: st.terminal, provider: st.provider, plate: st.plate || null, firstName: st.firstName,
     needsCode: st.needsCode === true, hasPin: st.hasPin === true, lockedUntil: st.lockedUntil || null,
+    // tc-0026 (415): how he signs in, and whether his ABN / taxi number are still to be given (asked right after)
+    signinWith: st.signinWith === "password" ? "password" : "code", needsDetails: st.needsDetails === true,
   };
 }
 
@@ -90,6 +95,28 @@ export async function POST(request) {
     if (!st?.ok) return say(problemText(st?.problem), 409, { problem: st?.problem || "unknown" });
 
     if (action === "hello") return NextResponse.json({ ok: true, ...stateView(st), jobs: await M.jobsOn(kh) });   // tc-0020: the office's switch
+
+    // tc-0026: a SYD CABS driver signs in with his SYD CABS email and password - not the TaxiCharg code or a PIN
+    if (st.signinWith === "password" && (action === "code" || action === "checkCode" || action === "setPin" || action === "signin")) {
+      return say(problemText("use_password"), 409, { problem: "use_password" });
+    }
+
+    if (action === "password") {
+      if (st.signinWith !== "password") return say(problemText("use_code"), 409, { problem: "use_code" });
+      const email = String(body.email ?? "").trim();
+      const password = typeof body.password === "string" ? body.password : "";
+      if (email.length > 254 || !/^[^\s@]{1,64}@[^\s@]{1,190}$/.test(email)) return say("Type the email you sign in to SYD CABS with.");
+      if (!password || password.length > 200) return say("Type your SYD CABS password.");
+      if (!(await rateHit(`tc-menu-pw:${kh.slice(0, 32)}`, 30, 3600))) return say("Too many tries. Wait, then try again.", 429);
+      const token = newSessionToken();
+      const r = await M.signinPassword(kh, email, password, sha256(token));
+      if (!r?.ok) {
+        return say(problemText(r?.problem, { ...(r || {}), kind: "password" }), r?.problem === "wrong_password" ? 401 : 409,
+          { problem: r?.problem || "unknown", triesLeft: r?.triesLeft ?? null, until: r?.until || null });
+      }
+      await M.endOtherSessions(r.driverId, r.sessionId);   // tc-0023: one terminal at a time
+      return NextResponse.json({ ok: true, session: token, expiresAt: r.expiresAt, firstName: st.firstName, needsDetails: r.needsDetails === true });
+    }
 
     if (action === "code") {
       if (!(await rateHit(`tc-menu-code:${st.driverId}`, 5, 3600))) return say("Too many codes in an hour. Wait, then try again.", 429);
@@ -152,6 +179,7 @@ async function signedIn(action, body, { kh, th, st, driverId }) {
     if (!driver || !extras) return say("Sign in again.", 401);
     const out = {
       ok: true, name: driver.name, driverId: driver.driverId, abn: extras.abn, taxiNumber: extras.taxiNumber,
+      needsDetails: !String(extras.abn || "").trim() || !String(extras.taxiNumber || "").trim(),   // tc-0026: both are asked right after sign-in
       // tc-0020: the profile as the GM terminal shows it
       authorityExpires: more.authorityExpires, since: more.since, mid: more.midLast4 ? `****${more.midLast4}` : null,
       // tc-0022 (the owner, 9 Nov 2026: the taxi number he types is the one shown and printed): his own taxi number
